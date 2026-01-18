@@ -15,10 +15,10 @@ const LogoCarousel = () => {
   const extendedLogos = [...cryptoLogos, ...cryptoLogos, ...cryptoLogos];
 
   return (
-    <div className="w-full overflow-hidden bg-background/10 backdrop-blur-sm py-12 mt-20">
+    <div className="w-full overflow-hidden py-12 mt-20">
       <motion.div 
         className="flex space-x-16"
-        initial={{ opacity: 0, x: "0%" }}
+        initial={{ opacity: 1, x: "0%" }}
         animate={{
           opacity: 1,
           x: "-50%"
@@ -43,8 +43,8 @@ const LogoCarousel = () => {
             key={`logo-${index}`}
             src={logo.url}
             alt={logo.name}
-            className="h-8 w-8 object-contain"
-            initial={{ opacity: 0.5 }}
+            className="h-8 w-8 object-contain !opacity-100"
+            initial={{ opacity: 1 }}
             whileHover={{ 
               opacity: 1,
               scale: 1.05,

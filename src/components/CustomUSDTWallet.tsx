@@ -205,14 +205,14 @@ const CustomUSDTWallet = () => {
   return (
     <div className="space-y-6">
       {/* Total Balance Card */}
-      <Card className="relative overflow-hidden bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 text-white border-0">
+      <Card className="relative overflow-hidden bg-gradient-to-br from-[#2463eb] via-blue-600 to-blue-700 text-white border-0">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24 blur-2xl" />
 
         <CardHeader className="relative">
           <div className="flex items-center justify-between">
             <div>
-              <CardDescription className="text-green-100">
+              <CardDescription className="text-blue-100">
                 Total Bexprot Wallet Balance
                 {isDemo && " (Demo)"}
               </CardDescription>
@@ -238,14 +238,14 @@ const CustomUSDTWallet = () => {
             </div>
           </div>
           {lastUpdated && (
-            <div className="mt-2 text-sm text-green-100">
+            <div className="mt-2 text-sm text-blue-100">
               Last updated: {lastUpdated.toLocaleString()}
             </div>
           )}
         </CardHeader>
 
         <CardContent className="relative">
-          <div className="flex items-center gap-2 text-green-50 mb-4">
+          <div className="flex items-center gap-2 text-blue-50 mb-4">
             <WalletIcon className="h-4 w-4" />
             <span className="text-sm">Tether USD (USDT)</span>
           </div>

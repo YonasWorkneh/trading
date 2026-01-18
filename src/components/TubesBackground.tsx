@@ -65,12 +65,12 @@ const TubesBackground = () => {
         container.innerHTML = "";
 
         instanceRef.current = new TubesCtor(container, {
-          // Main app base colors (deep navy/green-ish)
-          colors: [0x0b1220, 0x0f1a2e, 0x12324f, 0x1b3a2e],
+          // Main app base colors (light blue-ish)
+          colors: [0xe8f0fe, 0xd0e0fc, 0xb8d0fa, 0xa0c0f8],
           lightIntensity: 200,
-          lightColor1: 0x22c55e, // green
-          lightColor2: 0x15803d, // dark green
-          lightColor3: 0x6b7280, // gray-green
+          lightColor1: 0x2463eb, // blue
+          lightColor2: 0x1e4fd4, // dark blue
+          lightColor3: 0x6b7280, // gray
         });
       } catch (err) {
         console.error("TubesBackground: failed to load/init", err);

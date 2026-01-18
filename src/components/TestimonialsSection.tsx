@@ -51,7 +51,7 @@ const testimonials = [
 
 const TestimonialsSection = () => {
   return (
-    <section className="py-20 overflow-hidden bg-black">
+    <section className="py-20 overflow-hidden bg-white">
       <div className="container px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -60,19 +60,19 @@ const TestimonialsSection = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-center mb-16"
         >
-          <h2 className="text-5xl font-normal mb-4">Trusted by Traders</h2>
+          <h2 className="text-5xl font-normal mb-4 text-gray-900">Trusted by Traders</h2>
           <p className="text-muted-foreground text-lg">
             Join thousands of satisfied traders on CryptoTrade
           </p>
         </motion.div>
 
         <div className="relative flex flex-col antialiased">
-          <div className="relative flex overflow-hidden py-4 [mask-image:linear-gradient(to_right,transparent,white_10%,white_90%,transparent)]">
+          <div className="relative flex overflow-hidden py-4 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
             <div className="animate-marquee flex shrink-0 items-stretch gap-8">
               {testimonials.map((testimonial, index) => (
                 <Card
                   key={`${index}-1`}
-                  className="w-[400px] shrink-0 bg-black/40 backdrop-blur-xl border-white/5 hover:border-white/10 transition-all duration-300 p-8"
+                  className="w-[400px] shrink-0 bg-white/80 backdrop-blur-xl border-gray-200/50 hover:border-[#2463eb]/30 transition-all duration-300 p-8 shadow-sm"
                 >
                   <div className="flex items-center gap-4 mb-6">
                     <Avatar className="h-12 w-12">
@@ -80,15 +80,15 @@ const TestimonialsSection = () => {
                       <AvatarFallback>{testimonial.name[0]}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <h4 className="font-medium text-white/90">
+                      <h4 className="font-medium text-gray-900">
                         {testimonial.name}
                       </h4>
-                      <p className="text-sm text-white/60">
+                      <p className="text-sm text-gray-600">
                         {testimonial.role}
                       </p>
                     </div>
                   </div>
-                  <p className="text-white/70 leading-relaxed">
+                  <p className="text-gray-700 leading-relaxed">
                     {testimonial.content}
                   </p>
                 </Card>
@@ -101,7 +101,7 @@ const TestimonialsSection = () => {
               {testimonials.map((testimonial, index) => (
                 <Card
                   key={`${index}-2`}
-                  className="w-[400px] shrink-0 bg-black/40 backdrop-blur-xl border-white/5 hover:border-white/10 transition-all duration-300 p-8"
+                  className="w-[400px] shrink-0 bg-white/80 backdrop-blur-xl border-gray-200/50 hover:border-[#2463eb]/30 transition-all duration-300 p-8 shadow-sm"
                 >
                   <div className="flex items-center gap-4 mb-6">
                     <Avatar className="h-12 w-12">
@@ -109,15 +109,15 @@ const TestimonialsSection = () => {
                       <AvatarFallback>{testimonial.name[0]}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <h4 className="font-medium text-white/90">
+                      <h4 className="font-medium text-gray-900">
                         {testimonial.name}
                       </h4>
-                      <p className="text-sm text-white/60">
+                      <p className="text-sm text-gray-600">
                         {testimonial.role}
                       </p>
                     </div>
                   </div>
-                  <p className="text-white/70 leading-relaxed">
+                  <p className="text-gray-700 leading-relaxed">
                     {testimonial.content}
                   </p>
                 </Card>

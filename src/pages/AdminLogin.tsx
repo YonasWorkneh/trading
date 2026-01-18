@@ -168,8 +168,6 @@ const AdminLogin = () => {
             .eq("id", data.user.id)
             .maybeSingle();
 
-          console.log("profile", profile);
-
           // Check for RLS errors - RLS violations can appear as errors OR as null data
           // RLS Error Codes:
           // - 42501: PostgreSQL permission denied

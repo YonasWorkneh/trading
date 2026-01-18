@@ -233,7 +233,7 @@ const VerificationCode = () => {
 
               <Button
                 type="submit"
-                className="w-full bg-primary text-foreground hover:bg-primary/90 rounded-xl h-11 font-semibold"
+                className="w-full bg-primary text-white hover:bg-primary/90 rounded-xl h-11 font-semibold"
                 disabled={isLoading || code.length !== 6}
               >
                 {isLoading ? (

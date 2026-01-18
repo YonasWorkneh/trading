@@ -349,7 +349,7 @@ const Profile = () => {
 
             <Button
               onClick={handleSave}
-              className="bg-primary text-foreground hover:bg-primary/90"
+              className="bg-primary text-white hover:bg-primary/90"
             >
               Save Changes
             </Button>
@@ -411,7 +411,7 @@ const Profile = () => {
           <Button
             onClick={() => (window.location.href = "/kyc")}
             variant={user?.kycStatus === "verified" ? "outline" : "default"}
-            className="bg-primary text-foreground hover:bg-primary/90 rounded-xl"
+            className="bg-primary text-white hover:bg-primary/90 rounded-xl"
           >
             {user?.kycStatus === "verified"
               ? "View KYC Details"

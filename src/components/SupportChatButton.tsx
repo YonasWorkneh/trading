@@ -13,7 +13,7 @@ const SupportChatButton = () => {
         className="fixed bottom-20 md:bottom-6 right-6 z-50 cursor-pointer "
         onClick={() => setOpen(true)}
       >
-        <img src="/customer-support.png" alt="Support" className="h-14 w-14" />
+        <img src="/chat-icon.png" alt="Support" className="h-16 w-16" />
       </div>
 
       {/* Support Dialog */}

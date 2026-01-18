@@ -267,7 +267,7 @@ const Trade = () => {
 
           {/* Mode Selector */}
           <div className="flex bg-secondary/50 p-1 rounded-lg border border-border">
-            {(["spot", "futures", "contract"] as const)
+            {(["contract", "spot", "futures"] as const)
               .filter((mode) => mode !== "contract" || orders.length >= 0) // Placeholder to keep TS happy
               .filter((mode) => {
                 if (mode === "contract") {

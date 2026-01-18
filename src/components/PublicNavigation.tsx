@@ -3,8 +3,10 @@ import { Command, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Navigation = () => {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -39,9 +41,9 @@ const Navigation = () => {
       onClick: () => scrollToSection("testimonials"),
     },
     {
-      name: "About",
-      href: "#about",
-      onClick: () => scrollToSection("about"),
+      name:"Markets",
+      href: "/markets",
+      onClick: () => navigate("/markets"),
     },
   ];
 
@@ -49,19 +51,19 @@ const Navigation = () => {
     <header
       className={`fixed top-3.5 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 rounded-full ${
         isScrolled
-          ? "h-14 bg-[#1B1B1B]/40 backdrop-blur-xl border border-white/10 scale-95 w-[90%] max-w-2xl"
-          : "h-14 bg-[#1B1B1B] w-[95%] max-w-3xl"
+          ? "h-14 bg-white/50 backdrop-blur-xl border border-gray-200 shadow-lg scale-95 w-[90%] max-w-2xl"
+          : "h-14 bg-white/60 backdrop-blur-md w-[95%] max-w-3xl border border-gray-200"
       }`}
     >
       <div className="mx-auto h-full px-6">
         <nav className="flex items-center justify-between h-full">
           <div className="flex items-center gap-2">
             <img
-              src="https://bexprot.com/favicon.png"
-              alt="Bexprot"
+              src="/favicon.png"
+              alt="Trade Premium"
               className="w-5 h-5"
             />
-            <span className="font-bold text-base">Bexprot</span>
+            <span className="font-bold text-base text-gray-900">Trade Premium</span>
           </div>
 
           {/* Desktop Navigation */}
@@ -94,7 +96,7 @@ const Navigation = () => {
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="bg-[#1B1B1B]">
+              <SheetContent className="bg-white/95 backdrop-blur-xl border-gray-200">
                 <div className="flex flex-col gap-4 mt-8">
                   {navItems.map((item) => (
                     <Link

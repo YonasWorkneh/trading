@@ -69,7 +69,7 @@ interface AuthState {
     newPassword: string
   ) => Promise<{ success: boolean; error?: string }>;
   updatePreferences: (
-    preferences: any
+    preferences
   ) => Promise<{ success: boolean; error?: string }>;
   deleteAccount: () => Promise<{ success: boolean; error?: string }>;
   generateApiKey: () => Promise<{
@@ -104,18 +104,21 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         sessionStorage.setItem("pending_user_phone", phone);
       }
 
-      // Send OTP code via email (this will create the user after verification)
-      const { data, error } = await supabase.auth.signInWithOtp({
-        email,
-        // options: {
-        //   data: {
-        //     name,
-        //     phone,
-        //     email,
-        //   },
-        // },
-      });
+      // Construct redirect URL to login page with email pre-filled
+      const redirectUrl = `${window.location.origin}/auth?email=${encodeURIComponent(email)}`;
 
+      // Send OTP code via email (this will create the user after verification)
+     const { data, error } = await supabase.auth.signUp({
+        email,
+        password, // you need a password for traditional signup
+        options: {
+          emailRedirectTo: redirectUrl, // where the user is redirected after confirming email
+          data: {
+            name,
+            phone,
+          },
+        },
+});
       if (error) {
         sessionStorage.removeItem("pending_user_name");
         sessionStorage.removeItem("pending_user_email");
@@ -126,7 +129,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
       // OTP code sent successfully
       return { success: true, confirmationRequired: true };
-    } catch (error: any) {
+    } catch (error) {
       sessionStorage.removeItem("pending_user_name");
       sessionStorage.removeItem("pending_user_email");
       sessionStorage.removeItem("pending_user_password");
@@ -149,10 +152,14 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         sessionStorage.setItem("pending_user_phone", phone);
       }
 
+      // Construct redirect URL to login page with email pre-filled
+      const redirectUrl = `${window.location.origin}/auth?email=${encodeURIComponent(email)}`;
+
       // Send OTP code via email
       const { data, error } = await supabase.auth.signInWithOtp({
         email,
         options: {
+          emailRedirectTo: redirectUrl,
           shouldCreateUser: true,
           data: {
             name,
@@ -170,7 +177,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
       // OTP code sent successfully
       return { success: true, confirmationRequired: true };
-    } catch (error: any) {
+    } catch (error) {
       sessionStorage.removeItem("pending_user_name");
       sessionStorage.removeItem("pending_user_email");
       sessionStorage.removeItem("pending_user_phone");
@@ -197,7 +204,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       }
 
       return { success: true, confirmationRequired: true };
-    } catch (error: any) {
+    } catch (error) {
       return {
         success: false,
         error: error.message || "Failed to send verification code",
@@ -250,7 +257,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
           pendingEmail === email &&
           (!profile?.name || profile.name === email)
         ) {
-          const updates: any = { name: pendingName };
+          const updates: Record<string, string> = { name: pendingName };
           if (pendingPhone) updates.phone = pendingPhone;
 
           await supabase.from("users").update(updates).eq("id", data.user.id);
@@ -321,7 +328,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
       set({ isLoading: false });
       return { success: false, error: "Verification failed" };
-    } catch (error: any) {
+    } catch (error) {
       set({ isLoading: false });
       return { success: false, error: error.message || "Verification failed" };
     }
@@ -383,10 +390,10 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
       set({ isLoading: false });
       return { success: false, error: "Login failed" };
-    } catch (error: any) {
+      } catch (error) {
       console.error("authStore: unexpected error", error);
       set({ isLoading: false });
-      return { success: false, error: error.message || "Login failed" };
+      return { success: false, error: error?.message || "Login failed" };
     }
   },
 
@@ -429,7 +436,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       if (error) throw error;
 
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       return {
         success: false,
         error: error.message || "Password reset failed",
@@ -449,7 +456,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       }
 
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       return {
         success: false,
         error: error.message || "Password update failed",
@@ -458,7 +465,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   },
 
   // Update preferences
-  updatePreferences: async (preferences: any) => {
+  updatePreferences: async (preferences) => {
     try {
       const { user } = get();
       if (!user) return { success: false, error: "Not authenticated" };
@@ -475,7 +482,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       set({ user: updatedUser });
 
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       return {
         success: false,
         error: error.message || "Failed to update preferences",
@@ -500,7 +507,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       set({ user: null, isAuthenticated: false });
 
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       return {
         success: false,
         error: error.message || "Failed to delete account",
@@ -540,7 +547,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       set({ user: updatedUser });
 
       return { success: true, apiKey: newKey };
-    } catch (error: any) {
+    } catch (error) {
       return {
         success: false,
         error: error.message || "Failed to generate API key",
@@ -586,6 +593,24 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       }
 
       if (currentUser) {
+        // Check if there's a pending password for this user (from registration)
+        const pendingPassword = sessionStorage.getItem("pending_user_password");
+        const pendingEmail = sessionStorage.getItem("pending_user_email");
+        
+        // If user was just verified via email link and has pending password, set it
+        if (pendingPassword && pendingEmail === currentUser.email) {
+          const { error: passwordError } = await supabase.auth.updateUser({
+            password: pendingPassword,
+          });
+          
+          if (passwordError) {
+            console.error("Error setting password:", passwordError);
+          } else {
+            console.log("Password set successfully for verified user");
+            // Don't clear pending data yet - we'll clear it after user logs in with password
+          }
+        }
+        
         console.log("authStore: user found", currentUser.id);
 
         // Optimistic update: Set authenticated immediately with basic info

@@ -305,8 +305,8 @@ const TradingPanel = ({
               variant={side === "buy" ? "default" : "outline"}
               className={`h-12 ${
                 side === "buy"
-                  ? "bg-green-500 hover:bg-green-600 border-green-500"
-                  : "hover:bg-green-500/10 hover:text-green-500"
+                  ? "bg-primary hover:bg-primary/90 border-primary"
+                  : "hover:bg-primary/10 hover:text-primary"
               }`}
               onClick={() => setSide("buy")}
             >
@@ -336,7 +336,7 @@ const TradingPanel = ({
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger
               value="buy"
-              className="data-[state=active]:bg-green-500/20 data-[state=active]:text-green-500"
+              className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
             >
               {tradingMode === "futures" ? "Long" : "Buy"}
             </TabsTrigger>
@@ -537,7 +537,7 @@ const TradingPanel = ({
           <Button
             className={`w-full h-12 text-lg font-bold ${
               side === "buy"
-                ? "bg-green-600 hover:bg-green-700"
+                ? "bg-primary hover:bg-primary/90"
                 : "bg-red-600 hover:bg-red-700"
             }`}
             onClick={handlePlaceOrder}

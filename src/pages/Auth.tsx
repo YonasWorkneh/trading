@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -22,32 +22,68 @@ const Auth = () => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [verificationMethod, setVerificationMethod] = useState<
-    "email" | "phone" | "password"
-  >("password");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const {
     login,
     register,
-    registerWithMagicLink,
-    loginWithMagicLink,
     isAuthenticated,
   } = useAuthStore();
 
+  // Pre-fill email from URL params and switch to login mode
   useEffect(() => {
-    if (isAuthenticated) {
+    const emailParam = searchParams.get("email");
+    if (emailParam) {
+      setEmail(emailParam);
+      setIsLogin(true);
+      
+      // If user is authenticated (from email verification), check if they have pending password
+      if (isAuthenticated) {
+        const pendingPassword = sessionStorage.getItem("pending_user_password");
+        const pendingEmail = sessionStorage.getItem("pending_user_email");
+        
+        if (pendingPassword && pendingEmail === emailParam) {
+          // User was auto-logged in from email verification
+          // Password should already be set by checkSession, now log them out so they can log in with password
+          const { logout } = useAuthStore.getState();
+          // Small delay to ensure password is set
+          setTimeout(() => {
+            logout("/auth?email=" + encodeURIComponent(emailParam));
+            toast({
+              title: "Email Verified",
+              description: "Your email has been verified. Please enter your password to log in.",
+            });
+          }, 500);
+          return;
+        } else {
+          // Already logged in normally, redirect to dashboard
+          navigate("/dashboard");
+          return;
+        }
+      }
+      
+      toast({
+        title: "Email Verified",
+        description: "Your email has been verified. Please enter your password to log in.",
+      });
+    }
+  }, [searchParams, isAuthenticated, navigate, toast]);
+
+  useEffect(() => {
+    // Only redirect to dashboard if authenticated and no email param (normal login flow)
+    if (isAuthenticated && !searchParams.get("email")) {
       // Small delay to allow state to settle
       const timer = setTimeout(() => {
         navigate("/dashboard");
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,119 +112,35 @@ const Auth = () => {
         setIsLoading(false); // Ensure local loading is off
       }
     } else {
-      // Register
-      if (verificationMethod === "password") {
-        if (password !== confirmPassword) {
-          toast({
-            title: "Error",
-            description: "Passwords do not match",
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          return;
-        }
-
-        const result = await register(name, email, password, phone);
-        if (result.success) {
-          toast({
-            title: "Verification Code Sent",
-            description: "We've sent you a verification code to your email.",
-          });
-          // Navigate to verification page with email
-          navigate("/verify-code", { state: { email, isRegistration: true } });
-        } else {
-          toast({
-            title: "Error",
-            description: result.error || "Registration failed",
-            variant: "destructive",
-          });
-        }
-      } else {
-        // Register with OTP code
-        const result = await registerWithMagicLink(name, email, phone);
-        if (result.success) {
-          toast({
-            title: "Verification Code Sent",
-            description: "We've sent you a verification code to your email.",
-          });
-          // Navigate to verification page with email
-          navigate("/verify-code", { state: { email, isRegistration: true } });
-        } else {
-          toast({
-            title: "Error",
-            description: result.error || "Registration failed",
-            variant: "destructive",
-          });
-        }
+      // Register with password
+      if (password !== confirmPassword) {
+        toast({
+          title: "Error",
+          description: "Passwords do not match",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
       }
-    }
 
-    setIsLoading(false);
-  };
-
-  const handleResendCode = async () => {
-    setIsLoading(true);
-    if (isLogin) {
-      const result = await loginWithMagicLink(email);
+      const result = await register(name, email, password, phone);
       if (result.success) {
         toast({
-          title: "Code Resent",
-          description: "A new verification code has been sent to your email.",
+          title: "Verification Email Sent",
+          description: "Please check your email and click the verification link. You'll be redirected to login once verified.",
         });
       } else {
         toast({
           title: "Error",
-          description: result.error || "Failed to resend code",
-          variant: "destructive",
-        });
-      }
-    } else {
-      const result = await registerWithMagicLink(name, email, phone);
-      if (result.success) {
-        toast({
-          title: "Code Resent",
-          description: "A new verification code has been sent to your email.",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: result.error || "Failed to resend code",
+          description: result.error || "Registration failed",
           variant: "destructive",
         });
       }
     }
+
     setIsLoading(false);
   };
 
-  const handleMagicLinkLogin = async () => {
-    if (!email) {
-      toast({
-        title: "Email Required",
-        description:
-          "Please enter your email address to login with verification code.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    const result = await loginWithMagicLink(email);
-    if (result.success) {
-      toast({
-        title: "Verification Code Sent",
-        description: "We've sent you a verification code to your email.",
-      });
-      // Navigate to verification page with email
-      navigate("/verify-code", { state: { email, isRegistration: false } });
-    } else {
-      toast({
-        title: "Error",
-        description: result.error || "Failed to send verification code",
-        variant: "destructive",
-      });
-    }
-    setIsLoading(false);
-  };
 
   const features = [
     {
@@ -211,9 +163,9 @@ const Auth = () => {
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary/20 via-background to-background p-12 flex-col justify-between">
         <div>
           <div className="flex items-center gap-3 mb-12">
-            <img src={logo} alt="Bexprot" className="w-12 h-12 rounded-xl" />
+            <img src={logo} alt="Trade Premium" className="w-12 h-12 rounded-xl" />
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Bexprot</h1>
+              <h1 className="text-2xl font-bold text-foreground">Trade Premium</h1>
               <p className="text-sm text-muted-foreground">
                 Professional Trading Platform
               </p>
@@ -253,7 +205,7 @@ const Auth = () => {
         </div>
 
         <div className="text-sm text-muted-foreground">
-          <p>© 2024 Bexprot. All rights reserved.</p>
+          <p>© 2024 Trade Premium. All rights reserved.</p>
         </div>
       </div>
 
@@ -264,10 +216,10 @@ const Auth = () => {
           <div className="lg:hidden text-center mb-8">
             <img
               src={logo}
-              alt="Bexprot"
+              alt="Trade Premium"
               className="w-16 h-16 rounded-xl mx-auto mb-4"
             />
-            <h1 className="text-3xl font-bold text-foreground mb-2">Bexprot</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Trade Premium</h1>
             <p className="text-muted-foreground">
               Professional Trading Platform
             </p>
@@ -307,33 +259,6 @@ const Auth = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {!isLogin && (
-                <div className="flex gap-2 mb-4">
-                  <Button
-                    type="button"
-                    variant={
-                      verificationMethod === "email" ? "default" : "outline"
-                    }
-                    onClick={() => setVerificationMethod("email")}
-                    className="flex-1 text-xs"
-                    size="sm"
-                  >
-                    Magic Link
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={
-                      verificationMethod === "password" ? "default" : "outline"
-                    }
-                    onClick={() => setVerificationMethod("password")}
-                    className="flex-1 text-xs"
-                    size="sm"
-                  >
-                    Password
-                  </Button>
-                </div>
-              )}
-
               {!isLogin && (
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">
@@ -381,7 +306,7 @@ const Auth = () => {
                 </div>
               )}
 
-              {!isLogin && verificationMethod === "password" && (
+              {!isLogin && (
                 <>
                   <div>
                     <label className="text-sm font-medium text-foreground mb-2 block">
@@ -488,58 +413,35 @@ const Auth = () => {
               )}
 
               {isLogin && (
-                <div className="flex flex-col gap-3">
-                  <Button
-                    type="submit"
-                    className="w-full bg-primary text-foreground hover:bg-primary/90 rounded-xl h-11 font-semibold"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Logging in...
-                      </>
-                    ) : (
-                      "Login with Password"
-                    )}
-                  </Button>
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-border" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-card px-2 text-muted-foreground">
-                        Or continue with
-                      </span>
-                    </div>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full rounded-xl h-11 font-semibold"
-                    onClick={handleMagicLinkLogin}
-                    disabled={isLoading}
-                  >
-                    Login with Magic Link
-                  </Button>
-                </div>
-              )}
-
-              {!isLogin && (
                 <Button
                   type="submit"
-                  className="w-full bg-primary text-foreground hover:bg-primary/90 rounded-xl h-11 font-semibold"
+                  className="w-full bg-primary text-white hover:bg-primary/90 rounded-xl h-11 font-semibold"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Sending Magic Link...
+                      Logging in...
                     </>
-                  ) : verificationMethod === "password" ? (
-                    "Sign Up"
                   ) : (
-                    "Sign Up with Magic Link"
+                    "Login"
+                  )}
+                </Button>
+              )}
+
+              {!isLogin && (
+                <Button
+                  type="submit"
+                  className="w-full bg-primary text-white hover:bg-primary/90 rounded-xl h-11 font-semibold"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating Account...
+                    </>
+                  ) : (
+                    "Sign Up"
                   )}
                 </Button>
               )}

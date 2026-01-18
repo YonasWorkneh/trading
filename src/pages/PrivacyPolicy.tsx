@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 const PrivacyPolicy = () => {
   return (
-    <div className="min-h-screen bg-black text-foreground">
+    <div className="min-h-screen bg-white text-foreground">
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         {/* Back Button */}
         <div className="mb-8">
@@ -17,8 +17,8 @@ const PrivacyPolicy = () => {
         </div>
 
         {/* Content */}
-        <div className="glass rounded-xl p-8 md:p-12">
-          <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
+        <div className="bg-white/80 backdrop-blur-lg border border-gray-200 rounded-xl p-8 md:p-12 shadow-sm">
+          <h1 className="text-4xl font-bold mb-4 text-gray-900">Privacy Policy</h1>
           <p className="text-muted-foreground mb-8">
             Last Updated:{" "}
             {new Date().toLocaleDateString("en-US", {
@@ -30,8 +30,8 @@ const PrivacyPolicy = () => {
 
           <div className="space-y-8 text-sm">
             <section>
-              <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-900">1. Introduction</h2>
+              <p className="text-gray-700 leading-relaxed">
                 Welcome to Bexprot Trading Platform. This privacy policy
                 explains how we collect, use, and protect your personal
                 information when you use our trading services.
@@ -39,13 +39,13 @@ const PrivacyPolicy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-900">
                 2. Information We Collect
               </h2>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-gray-700 mb-4">
                 We collect the following information:
               </p>
-              <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-4">
+              <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
                 <li>
                   Personal identification information (Name, email address)
                 </li>
@@ -57,13 +57,13 @@ const PrivacyPolicy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-900">
                 3. How We Use Your Information
               </h2>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-gray-700 mb-4">
                 Your information is used to:
               </p>
-              <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-4">
+              <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
                 <li>Provide and improve our trading services</li>
                 <li>Process transactions and manage your account</li>
                 <li>Comply with legal and regulatory requirements</li>
@@ -73,10 +73,10 @@ const PrivacyPolicy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-900">
                 4. Data Storage & Security
               </h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-gray-700 leading-relaxed">
                 All data is securely stored on our backend servers. We implement
                 industry-standard security measures to protect your information.
                 Your wallet private keys are never stored on our servers.
@@ -84,10 +84,10 @@ const PrivacyPolicy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-900">
                 5. MetaMask Integration
               </h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-gray-700 leading-relaxed">
                 When you connect your MetaMask wallet, we only access your
                 public wallet address and balance. We never request or store
                 your private keys or seed phrases.
@@ -95,8 +95,8 @@ const PrivacyPolicy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">6. Trading Risks</h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-900">6. Trading Risks</h2>
+              <p className="text-gray-700 leading-relaxed">
                 Trading involves significant risk. You should only trade with
                 funds you can afford to lose. Past performance does not
                 guarantee future results. All trading decisions are your
@@ -105,10 +105,10 @@ const PrivacyPolicy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-900">
                 7. KYC Requirements
               </h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-gray-700 leading-relaxed">
                 To comply with regulations, we may require you to complete Know
                 Your Customer (KYC) verification. This includes providing
                 identification documents and proof of address.
@@ -116,11 +116,11 @@ const PrivacyPolicy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">8. Your Rights</h2>
-              <p className="text-muted-foreground mb-4">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-900">8. Your Rights</h2>
+              <p className="text-gray-700 mb-4">
                 You have the right to:
               </p>
-              <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-4">
+              <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
                 <li>Access your personal data</li>
                 <li>Request correction of inaccurate data</li>
                 <li>Request deletion of your account</li>
@@ -130,18 +130,18 @@ const PrivacyPolicy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">9. Contact Us</h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-900">9. Contact Us</h2>
+              <p className="text-gray-700 leading-relaxed">
                 If you have any questions about this privacy policy, please
                 contact us at privacy@bexprot.com
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-900">
                 10. Updates to This Policy
               </h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-gray-700 leading-relaxed">
                 We may update this privacy policy from time to time. The latest
                 version will always be available on our platform.
               </p>

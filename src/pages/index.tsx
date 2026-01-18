@@ -5,6 +5,7 @@ import {
   TrendingUp,
   Wallet,
   BarChart3,
+  TrendingDown,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -17,11 +18,32 @@ import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import LighthouseEffect from "@/components/LighthouseEffect";
 import TubesBackground from "@/components/TubesBackground";
 import bitcoinPrice from "@/assets/bitcoin-price.png";
-import cryptoTable from "@/assets/crypto-table.png";
+import { useQuery } from "@tanstack/react-query";
+import { fetchTopCryptos } from "@/lib/coingecko";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2 } from "lucide-react";
 
 const Index = () => {
+  // Fetch top 24 cryptocurrencies
+  const { data: markets, isLoading: marketsLoading } = useQuery({
+    queryKey: ["topCryptos", 24],
+    queryFn: () => fetchTopCryptos(24),
+    staleTime: 30000,
+    refetchInterval: 30000,
+  });
+
   return (
-    <div className="min-h-screen bg-black text-foreground">
+    <div className="min-h-screen bg-white text-foreground relative">
+      {/* Subtle background gradient overlay */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          background: `
+            linear-gradient(135deg, rgba(36, 99, 235, 0.01) 0%, transparent 50%),
+            linear-gradient(45deg, transparent 50%, rgba(36, 99, 235, 0.008) 100%)
+          `,
+        }}
+      />
       <TubesBackground />
       <LighthouseEffect />
       <Navigation />
@@ -34,7 +56,7 @@ const Index = () => {
         className="relative container px-4 pt-40 pb-20"
       >
         {/* Background */}
-        <div className="absolute inset-0 -z-10 bg-[#0A0A0A]" />
+        <div className="absolute inset-0 -z-10 bg-gray-50" />
 
         <motion.div
           initial={{ opacity: 0 }}
@@ -44,8 +66,8 @@ const Index = () => {
         >
           <span className="text-sm font-medium">
             <img
-              src="https://bexprot.com/favicon.png"
-              alt="Bexprot"
+              src="/favicon.png"
+              alt="Trade Premium"
               className="w-4 h-4 inline-block mr-2"
             />
             Next-gen crypto & stock trading platform
@@ -54,11 +76,11 @@ const Index = () => {
 
         <div className="max-w-4xl relative z-10">
           <h1 className="text-5xl md:text-7xl font-normal mb-4 tracking-tight text-left">
-            <span className="text-gray-200">
+            <span className="text-gray-700">
               <TextGenerateEffect words="Trade with" />
             </span>
             <br />
-            <span className="text-white font-medium">
+            <span className="text-gray-900 font-medium">
               <TextGenerateEffect words="confidence." />
             </span>
           </h1>
@@ -67,11 +89,11 @@ const Index = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl text-left"
+            className="text-lg md:text-md text-gray-600 mb-8 max-w-2xl text-left font-normal"
           >
             Experience seamless cryptocurrency and stock trading with advanced
             features, real-time analytics, and institutional-grade security.{" "}
-            <span className="text-white">Start trading in minutes.</span>
+            <strong>Start trading in minutes.</strong>
           </motion.p>
 
           <motion.div
@@ -83,7 +105,7 @@ const Index = () => {
             <Button size="lg" className="button-gradient text-white" asChild>
               <Link to="/dashboard">Start Trading Now</Link>
             </Button>
-            <Button size="lg" variant="link" className="text-white" asChild>
+            <Button size="lg" variant="link" className="text-gray-900" asChild>
               <Link to="/markets">View Markets</Link>
             </Button>
           </motion.div>
@@ -95,12 +117,179 @@ const Index = () => {
           transition={{ delay: 0.6 }}
           className="relative mx-auto max-w-5xl mt-20"
         >
-          <div className="glass rounded-xl overflow-hidden">
-            <img
-              src={cryptoTable}
-              alt="Bexprot Trading Dashboard"
-              className="w-full h-auto"
-            />
+          <div className="backdrop-blur-lg border border-gray-200 rounded-xl p-6 shadow-sm">
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Live Markets</h2>
+              <p className="text-sm text-gray-600">Real-time prices and 24h changes</p>
+            </div>
+
+            {marketsLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : markets && markets.length > 0 ? (
+              <Tabs defaultValue="all" className="w-full">
+                <TabsList className="grid w-full grid-cols-3 mb-6 bg-gray-100 border border-gray-200 rounded-lg">
+                  <TabsTrigger value="all" className="data-[state=active]:bg-white data-[state=active]:text-primary">
+                    All Markets
+                  </TabsTrigger>
+                  <TabsTrigger value="gainers" className="data-[state=active]:bg-white data-[state=active]:text-primary">
+                    Rising
+                  </TabsTrigger>
+                  <TabsTrigger value="losers" className="data-[state=active]:bg-white data-[state=active]:text-primary">
+                    Falling
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="all" className="mt-0">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {markets.map((market) => {
+                      const isPositive = market.price_change_percentage_24h >= 0;
+                      return (
+                        <Link
+                          key={market.id}
+                          to={`/crypto/${market.id}`}
+                          className="group bg-white border border-gray-200 rounded-lg p-4 hover:border-primary/50 hover:shadow-md transition-all"
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={market.image}
+                                alt={market.name}
+                                className="w-8 h-8 rounded-full"
+                              />
+                              <div>
+                                <div className="font-semibold text-gray-900 text-sm">
+                                  {market.symbol.toUpperCase()}
+                                </div>
+                                <div className="text-xs text-gray-500">{market.name}</div>
+                              </div>
+                            </div>
+                            {isPositive ? (
+                              <TrendingUp className="h-4 w-4 text-[#2463eb]" />
+                            ) : (
+                              <TrendingDown className="h-4 w-4 text-red-500" />
+                            )}
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="text-sm font-mono font-semibold text-gray-900">
+                                ${market.current_price.toLocaleString(undefined, {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 6,
+                                })}
+                              </div>
+                            </div>
+                            <div
+                              className={`text-sm font-semibold ${
+                                isPositive ? "text-[#2463eb]" : "text-red-500"
+                              }`}
+                            >
+                              {isPositive ? "+" : ""}
+                              {market.price_change_percentage_24h.toFixed(2)}%
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="gainers" className="mt-0">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {markets
+                      .filter((m) => m.price_change_percentage_24h >= 0)
+                      .sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h)
+                      .map((market) => (
+                        <Link
+                          key={market.id}
+                          to={`/crypto/${market.id}`}
+                          className="group bg-white border border-gray-200 rounded-lg p-4 hover:border-primary/50 hover:shadow-md transition-all"
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={market.image}
+                                alt={market.name}
+                                className="w-8 h-8 rounded-full"
+                              />
+                              <div>
+                                <div className="font-semibold text-gray-900 text-sm">
+                                  {market.symbol.toUpperCase()}
+                                </div>
+                                <div className="text-xs text-gray-500">{market.name}</div>
+                              </div>
+                            </div>
+                            <TrendingUp className="h-4 w-4 text-[#2463eb]" />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="text-sm font-mono font-semibold text-gray-900">
+                                ${market.current_price.toLocaleString(undefined, {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 6,
+                                })}
+                              </div>
+                            </div>
+                            <div className="text-sm font-semibold text-[#2463eb]">
+                              +{market.price_change_percentage_24h.toFixed(2)}%
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="losers" className="mt-0">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {markets
+                      .filter((m) => m.price_change_percentage_24h < 0)
+                      .sort((a, b) => a.price_change_percentage_24h - b.price_change_percentage_24h)
+                      .map((market) => (
+                        <Link
+                          key={market.id}
+                          to={`/crypto/${market.id}`}
+                          className="group bg-white border border-gray-200 rounded-lg p-4 hover:border-primary/50 hover:shadow-md transition-all"
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={market.image}
+                                alt={market.name}
+                                className="w-8 h-8 rounded-full"
+                              />
+                              <div>
+                                <div className="font-semibold text-gray-900 text-sm">
+                                  {market.symbol.toUpperCase()}
+                                </div>
+                                <div className="text-xs text-gray-500">{market.name}</div>
+                              </div>
+                            </div>
+                            <TrendingDown className="h-4 w-4 text-red-500" />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="text-sm font-mono font-semibold text-gray-900">
+                                ${market.current_price.toLocaleString(undefined, {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 6,
+                                })}
+                              </div>
+                            </div>
+                            <div className="text-sm font-semibold text-red-500">
+                              {market.price_change_percentage_24h.toFixed(2)}%
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                  </div>
+                </TabsContent>
+              </Tabs>
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                No market data available
+              </div>
+            )}
           </div>
         </motion.div>
       </motion.section>
@@ -109,201 +298,13 @@ const Index = () => {
       <LogoCarousel />
 
       {/* Features Section */}
-      <div id="features" className="bg-black">
+      <div id="features" className="bg-white">
         <FeaturesSection />
       </div>
 
-      {/* About Us Section */}
-      <section id="about" className="container px-4 py-20 bg-black">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">About Bexprot</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Empowering traders worldwide with cutting-edge technology and
-            institutional-grade trading tools.
-          </p>
-        </motion.div>
-
-        <div className="max-w-4xl mx-auto space-y-12">
-          {/* Our Story */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            viewport={{ once: true }}
-            className="glass rounded-xl p-8"
-          >
-            <h3 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-              <TrendingUp className="w-6 h-6 text-primary" />
-              Our Story
-            </h3>
-            <p className="text-muted-foreground leading-relaxed">
-              Bexprot was founded with a simple yet powerful vision: to make
-              professional-grade trading accessible to everyone. We recognized
-              that the financial markets were evolving rapidly, and traders
-              needed a platform that could keep pace with innovation while
-              maintaining the highest standards of security and reliability.
-            </p>
-            <p className="text-muted-foreground leading-relaxed mt-4">
-              Today, we serve over 50,000 active traders across the globe,
-              processing billions in trading volume while maintaining a 99.9%
-              uptime guarantee. Our commitment to excellence has made us a
-              trusted partner for both individual traders and institutional
-              investors.
-            </p>
-          </motion.div>
-
-          {/* Mission & Vision */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              viewport={{ once: true }}
-              className="glass rounded-xl p-8"
-            >
-              <h3 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-                <BarChart3 className="w-6 h-6 text-primary" />
-                Our Mission
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                To democratize access to advanced trading tools and market
-                insights, enabling traders of all levels to make informed
-                decisions and achieve their financial goals. We believe that
-                everyone deserves access to the same powerful tools used by
-                professional traders.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              viewport={{ once: true }}
-              className="glass rounded-xl p-8"
-            >
-              <h3 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-                <Wallet className="w-6 h-6 text-primary" />
-                Our Vision
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                To become the world's most trusted and innovative trading
-                platform, setting new standards for security, performance, and
-                user experience. We envision a future where trading is seamless,
-                secure, and accessible to everyone, regardless of their location
-                or experience level.
-              </p>
-            </motion.div>
-          </div>
-
-          {/* Core Values */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="glass rounded-xl p-8"
-          >
-            <h3 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-              <Shield className="w-6 h-6 text-primary" />
-              Our Core Values
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[
-                {
-                  title: "Security First",
-                  description:
-                    "We prioritize the safety of your assets and data above all else, implementing bank-grade security measures and regular audits.",
-                },
-                {
-                  title: "Innovation",
-                  description:
-                    "We continuously evolve our platform with cutting-edge technology to stay ahead of market trends and user needs.",
-                },
-                {
-                  title: "Transparency",
-                  description:
-                    "We believe in clear communication, honest pricing, and providing full visibility into our operations and fees.",
-                },
-                {
-                  title: "User-Centric",
-                  description:
-                    "Every feature we build is designed with our users in mind, ensuring an intuitive and powerful trading experience.",
-                },
-              ].map((value, index) => (
-                <div key={value.title} className="flex gap-4">
-                  <div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-2" />
-                  <div>
-                    <h4 className="font-semibold mb-2">{value.title}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {value.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Why Choose Us */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            viewport={{ once: true }}
-            className="glass rounded-xl p-8"
-          >
-            <h3 className="text-2xl font-semibold mb-6">Why Choose Bexprot?</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                {
-                  icon: <Shield className="w-8 h-8 text-primary" />,
-                  title: "Bank-Grade Security",
-                  description:
-                    "Your assets are protected with industry-leading security measures and encryption.",
-                },
-                {
-                  icon: <TrendingUp className="w-8 h-8 text-primary" />,
-                  title: "Real-Time Trading",
-                  description:
-                    "Execute trades instantly with our lightning-fast order execution system.",
-                },
-                {
-                  icon: <Wallet className="w-8 h-8 text-primary" />,
-                  title: "Multi-Asset Support",
-                  description:
-                    "Trade cryptocurrencies, stocks, forex, and commodities all in one platform.",
-                },
-                {
-                  icon: <BarChart3 className="w-8 h-8 text-primary" />,
-                  title: "Advanced Analytics",
-                  description:
-                    "Make informed decisions with professional charts and market analysis tools.",
-                },
-              ].map((feature, index) => (
-                <div
-                  key={feature.title}
-                  className="text-center"
-                >
-                  <div className="flex justify-center mb-4">{feature.icon}</div>
-                  <h4 className="text-lg font-semibold mb-2">{feature.title}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {feature.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Stats Section */}
-      <section className="container px-4 py-20 bg-black">
-        <div className="glass rounded-2xl p-8 md:p-12">
+      <section className="container px-4 py-20">
+        <div className="border border-gray-200 rounded-2xl p-8 md:p-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
               { value: "$2B+", label: "Trading Volume" },
@@ -331,7 +332,7 @@ const Index = () => {
       </section>
 
       {/* Live Prices Preview */}
-      <section className="container px-4 py-20 bg-black">
+      <section className="container px-4 py-20 bg-white">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -366,17 +367,17 @@ const Index = () => {
       </section>
 
       {/* Testimonials Section */}
-      <div id="testimonials" className="bg-black">
+      <div id="testimonials" className="bg-white">
         <TestimonialsSection />
       </div>
 
       {/* CTA Section */}
-      <section className="container px-4 py-20 relative bg-black/30">
+      <section className="container px-4 py-20 relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-[#0A0A0A]/80 backdrop-blur-lg border border-white/10 rounded-2xl p-8 md:p-12 text-center relative z-10"
+          className=" backdrop-blur-lg border border-gray-200 rounded-2xl p-8 md:p-12 text-center relative z-10"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to start trading?
@@ -392,7 +393,7 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <div className="bg-black">
+      <div className="bg-white">
         <Footer />
       </div>
     </div>

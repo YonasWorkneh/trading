@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 const MarketAnalysis = () => {
   return (
-    <div className="min-h-screen bg-black text-foreground">
+    <div className="min-h-screen bg-white text-foreground">
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         {/* Back Button */}
         <div className="mb-8">
@@ -18,12 +18,12 @@ const MarketAnalysis = () => {
         </div>
 
         {/* Content */}
-        <div className="glass rounded-xl p-8 md:p-12">
-          <h1 className="text-4xl font-bold mb-4 flex items-center gap-3">
+        <div className="bg-white/80 backdrop-blur-lg border border-gray-200 rounded-xl p-8 md:p-12 shadow-sm">
+          <h1 className="text-4xl font-bold mb-4 flex items-center gap-3 text-gray-900">
             <BarChart3 className="h-8 w-8 text-primary" />
             Market Analysis
           </h1>
-          <p className="text-muted-foreground mb-8">
+          <p className="text-gray-600 mb-8">
             Comprehensive market insights and analysis tools
           </p>
 
@@ -39,14 +39,14 @@ const MarketAnalysis = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h3 className="font-semibold mb-2">Chart Patterns</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-semibold mb-2 text-gray-900">Chart Patterns</h3>
+                  <p className="text-sm text-gray-700">
                     Identify support and resistance levels, trend lines, and chart patterns using our advanced TradingView integration. These patterns can help predict future price movements.
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-2">Technical Indicators</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-semibold mb-2 text-gray-900">Technical Indicators</h3>
+                  <p className="text-sm text-gray-700">
                     Use popular indicators like RSI, MACD, Moving Averages, and Bollinger Bands to make informed trading decisions. All indicators are available directly on our charts.
                   </p>
                 </div>
@@ -64,14 +64,14 @@ const MarketAnalysis = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h3 className="font-semibold mb-2">Market News</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-semibold mb-2 text-gray-900">Market News</h3>
+                  <p className="text-sm text-gray-700">
                     Stay updated with the latest market news, economic events, and announcements that can impact asset prices. Our platform aggregates news from trusted sources.
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-2">Economic Indicators</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-semibold mb-2 text-gray-900">Economic Indicators</h3>
+                  <p className="text-sm text-gray-700">
                     Monitor key economic indicators such as GDP, inflation rates, employment data, and central bank decisions that influence market movements.
                   </p>
                 </div>
@@ -89,14 +89,14 @@ const MarketAnalysis = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h3 className="font-semibold mb-2">Fear & Greed Index</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-semibold mb-2 text-gray-900">Fear & Greed Index</h3>
+                  <p className="text-sm text-gray-700">
                     Track market sentiment indicators to understand whether the market is driven by fear or greed. Extreme readings can signal potential reversals.
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-2">Volume Analysis</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-semibold mb-2 text-gray-900">Volume Analysis</h3>
+                  <p className="text-sm text-gray-700">
                     Analyze trading volume to confirm price movements. High volume often validates trends, while low volume may indicate weak moves.
                   </p>
                 </div>
@@ -109,7 +109,7 @@ const MarketAnalysis = () => {
                 <CardTitle>Available Analysis Tools</CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
+                <ul className="space-y-2 text-sm text-gray-700">
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
                     <span>Real-time price charts with multiple timeframes</span>
@@ -136,8 +136,8 @@ const MarketAnalysis = () => {
 
             {/* Disclaimer */}
             <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
-              <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">Disclaimer:</strong> Market analysis is for informational purposes only and should not be considered as financial advice. Always conduct your own research and consult with financial advisors before making trading decisions. Past performance does not guarantee future results.
+              <p className="text-sm text-gray-700">
+                <strong className="text-gray-900">Disclaimer:</strong> Market analysis is for informational purposes only and should not be considered as financial advice. Always conduct your own research and consult with financial advisors before making trading decisions. Past performance does not guarantee future results.
               </p>
             </div>
           </div>

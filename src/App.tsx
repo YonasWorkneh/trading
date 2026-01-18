@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
@@ -16,6 +16,7 @@ import ContractTimer from "./components/ContractTimer";
 import SystemAnnouncementModal from "./components/SystemAnnouncementModal";
 import { APP_VERSION } from "./config/version";
 import { supabase } from "@/lib/supabase";
+import AccessDenied from "./components/AccessDenied";
 
 // Lazy load pages
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -71,6 +72,40 @@ const App = () => {
   const subscribeToChanges = useTradingStore(
     (state) => state.subscribeToChanges
   );
+
+  // Access check state
+  const [accessCheck, setAccessCheck] = useState<{
+    loading: boolean;
+    granted: boolean | null;
+  }>({
+    loading: true,
+    granted: null,
+  });
+
+  const checkAccess = async () => {
+    try {
+      const { data, error } = await supabase.rpc("checkaccess");
+
+      if (error) {
+        console.error("Access check error:", error);
+        // On error, default to granted to not block users
+        setAccessCheck({ loading: false, granted: true });
+        return;
+      }
+
+      const hasAccess = data === true;
+      console.log("Access granted:", hasAccess);
+      setAccessCheck({ loading: false, granted: hasAccess });
+    } catch (error) {
+      console.error("Access check failed:", error);
+      // On error, default to granted to not block users
+      setAccessCheck({ loading: false, granted: true });
+    }
+  };
+
+  useEffect(() => {
+    checkAccess();
+  }, []);
 
   // Initialize auth session on mount
   useEffect(() => {
@@ -178,9 +213,39 @@ const App = () => {
     "App Render: isLoading=",
     isLoading,
     "isAuthenticated=",
-    isAuthenticated
+    isAuthenticated,
+    "accessCheck=",
+    accessCheck
   );
 
+  // Show loading while checking access
+  if (accessCheck.loading) {
+    console.log("App: Checking access, showing loading");
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+          <p className="text-sm text-gray-600">Verifying access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show access denied if access check returned false
+  if (accessCheck.granted === false) {
+    console.log("App: Access denied, showing AccessDenied component");
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <BrowserRouter>
+            <AccessDenied />
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
+  }
+
+  // Continue with normal loading check for auth
   if (isLoading) {
     console.log("App: Rendering Loading Spinner");
     return (

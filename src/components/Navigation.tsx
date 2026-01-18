@@ -7,6 +7,7 @@ import {
   Settings,
   User,
   FileText,
+  HelpCircle,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useState } from "react";
@@ -30,11 +31,12 @@ import {
 import logo from "@/assets/favicon.png";
 
 const navItems = [
-  { path: "/", icon: LayoutDashboard, label: "Dashboard" },
+  { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { path: "/trade", icon: TrendingUp, label: "Trade" },
   { path: "/markets", icon: BarChart3, label: "Markets" },
   { path: "/wallet", icon: Wallet, label: "Wallet" },
   { path: "/profile", icon: User, label: "Profile" },
+  { path: "/how-to-use", icon: HelpCircle, label: "Help" },
   { path: "/settings", icon: Settings, label: "Settings" },
 ];
 
@@ -49,8 +51,8 @@ const Navigation = () => {
           <Link to="/" className="px-4 py-6 border-b border-border">
             <div className="flex items-center gap-3">
               <img
-                src={logo}
-                alt="Bexprot Logo"
+                src={"/assets/favicon.png"}
+                alt="Trade Premium Logo"
                 className={`object-cover shrink-0 transition-all duration-300 ${
                   isOpen
                     ? "w-10 h-10 min-w-10 min-h-10 rounded-xl"
@@ -60,7 +62,7 @@ const Navigation = () => {
               {isOpen && (
                 <div>
                   <div className="font-bold text-foreground text-lg">
-                    Bexprot
+                    Trade Premium
                   </div>
                   <div className="text-xs text-muted-foreground">
                     Trading Platform
@@ -83,7 +85,7 @@ const Navigation = () => {
                           to={item.path}
                           end
                           className="hover:bg-secondary/50 transition-colors rounded-xl"
-                          activeClassName="bg-primary text-foreground font-medium hover:bg-primary"
+                          activeClassName="bg-primary text-white font-medium hover:bg-primary"
                         >
                           <Icon className="h-5 w-5" />
                           <span>{item.label}</span>
@@ -148,7 +150,7 @@ const Navigation = () => {
             <section>
               <h3 className="text-lg font-semibold mb-2">1. Introduction</h3>
               <p className="text-muted-foreground">
-                Welcome to Bexprot Trading Platform. This privacy policy
+                Welcome to Trade Premium Trading Platform. This privacy policy
                 explains how we collect, use, and protect your personal
                 information when you use our trading services.
               </p>
@@ -249,7 +251,7 @@ const Navigation = () => {
               <h3 className="text-lg font-semibold mb-2">9. Contact Us</h3>
               <p className="text-muted-foreground">
                 If you have any questions about this privacy policy, please
-                contact us at privacy@bexprot.com
+                contact us at privacy@tradepremium.com
               </p>
             </section>
 
