@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchTopCryptos } from "@/lib/coingecko";
+import { fetchTopCryptos, fetchPopularNFTs } from "@/lib/coingecko";
 import PriceCard from "@/components/PriceCard";
+import EmptyState from "@/components/EmptyState";
 import { useNavigate } from "react-router-dom";
 import {
   Loader2,
@@ -8,6 +9,7 @@ import {
   ChevronDown,
   ChevronUp,
   Wallet,
+  RefreshCw,
 } from "lucide-react";
 import { useTradingStore } from "@/store/tradingStore";
 import { useAuthStore } from "@/store/authStore";
@@ -104,11 +106,27 @@ const Dashboard = () => {
     return (winningTrades / totalTrades) * 100;
   })();
 
-  const { data: cryptos, isLoading } = useQuery({
+  const { data: cryptos, isLoading, refetch: refetchCryptos } = useQuery({
     queryKey: ["topCryptos"],
     queryFn: () => fetchTopCryptos(20),
-    refetchInterval: 30000,
   });
+
+  // Fetch popular NFT collections
+  const { data: nfts = [], isLoading: nftsLoading, refetch: refetchNFTs } = useQuery({
+    queryKey: ["popularNFTs"],
+    queryFn: () => fetchPopularNFTs(20), // Fetch top 20 popular NFTs
+    staleTime: 60000,
+    // Removed refetchInterval to prevent 429 errors
+  });
+
+  // Refresh handlers
+  const handleRefreshCryptos = async () => {
+    await refetchCryptos();
+  };
+
+  const handleRefreshNFTs = async () => {
+    await refetchNFTs();
+  };
 
   // Use computed statistics for real-time updates
   const equity = getEquity();
@@ -213,16 +231,28 @@ const Dashboard = () => {
 
       {/* Market Overview */}
       <div>
-        <h2 className="text-xl font-semibold text-foreground mb-4">
-          Top Cryptocurrencies
-        </h2>
+        <div className="flex items-center justify-between mb-10 mt-20">
+          <h2 className="text-xl font-semibold text-foreground">
+            Top Cryptocurrencies
+          </h2>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefreshCryptos}
+            disabled={isLoading}
+            className="gap-2 border-gray-300 hover:bg-gray-50 hover:text-primary cursor-pointer"
+          >
+            <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+        </div>
         {isLoading ? (
           <div className="flex items-center justify-center h-64">
             <Loader2 className="animate-spin text-primary" size={40} />
           </div>
-        ) : (
+        ) : cryptos && cryptos.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {cryptos?.map((crypto) => (
+            {cryptos.map((crypto) => (
               <PriceCard
                 key={crypto.id}
                 asset={crypto}
@@ -230,6 +260,44 @@ const Dashboard = () => {
               />
             ))}
           </div>
+        ) : (
+          <EmptyState type="crypto" />
+        )}
+      </div>
+
+      {/* Top NFTs Section */}
+      <div>
+        <div className="flex items-center justify-between mb-10 mt-20">
+          <h2 className="text-xl font-semibold text-foreground">
+            Top NFTs
+          </h2>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefreshNFTs}
+            disabled={nftsLoading}
+            className="gap-2 border-gray-300 hover:bg-gray-50 hover:text-primary cursor-pointer"
+          >
+            <RefreshCw className={`h-4 w-4 ${nftsLoading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+        </div>
+        {nftsLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <Loader2 className="animate-spin text-primary" size={40} />
+          </div>
+        ) : nfts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {nfts.map((nft) => (
+              <PriceCard
+                key={nft.id}
+                asset={nft}
+                onClick={() => navigate(`/markets`)}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyState type="nft" />
         )}
       </div>
     </div>

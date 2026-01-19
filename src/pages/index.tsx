@@ -6,6 +6,7 @@ import {
   Wallet,
   BarChart3,
   TrendingDown,
+  RefreshCw,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,18 +20,36 @@ import LighthouseEffect from "@/components/LighthouseEffect";
 import TubesBackground from "@/components/TubesBackground";
 import bitcoinPrice from "@/assets/bitcoin-price.png";
 import { useQuery } from "@tanstack/react-query";
-import { fetchTopCryptos } from "@/lib/coingecko";
+import { fetchTopCryptos, fetchPopularNFTs } from "@/lib/coingecko";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
 
 const Index = () => {
   // Fetch top 24 cryptocurrencies
-  const { data: markets, isLoading: marketsLoading } = useQuery({
+  const { data: markets, isLoading: marketsLoading, refetch: refetchMarkets } = useQuery({
     queryKey: ["topCryptos", 24],
     queryFn: () => fetchTopCryptos(24),
     staleTime: 30000,
-    refetchInterval: 30000,
+    // Removed refetchInterval to prevent 429 errors
   });
+
+  // Fetch popular NFT collections dynamically
+  const { data: popularNFTs = [], isLoading: nftLoading, refetch: refetchNFTs } = useQuery({
+    queryKey: ["popularNFTs"],
+    queryFn: () => fetchPopularNFTs(5), // Fetch top 5 popular NFTs
+    staleTime: 60000, // 1 minute
+    // Removed refetchInterval to prevent 429 errors
+    retry: 2,
+  });
+
+  // Manual refresh handler
+  const handleRefresh = async () => {
+    refetchMarkets();
+    refetchNFTs();
+  };
+
+  const isRefreshing = marketsLoading || nftLoading;
 
   return (
     <div className="min-h-screen bg-white text-foreground relative">
@@ -118,9 +137,21 @@ const Index = () => {
           className="relative mx-auto max-w-5xl mt-20"
         >
           <div className="backdrop-blur-lg border border-gray-200 rounded-xl p-6 shadow-sm">
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Live Markets</h2>
-              <p className="text-sm text-gray-600">Real-time prices and 24h changes</p>
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Live Markets</h2>
+                <p className="text-sm text-gray-600">Real-time prices and 24h changes</p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRefresh}
+                disabled={marketsLoading || nftLoading}
+                className="gap-2 border-gray-300 hover:bg-gray-50 hover:text-primary cursor-pointer"
+              >
+                <RefreshCw className={`h-4 w-4 ${marketsLoading || nftLoading ? "animate-spin" : ""}`} />
+                Refresh
+              </Button>
             </div>
 
             {marketsLoading ? (
@@ -133,16 +164,73 @@ const Index = () => {
                   <TabsTrigger value="all" className="data-[state=active]:bg-white data-[state=active]:text-primary">
                     All Markets
                   </TabsTrigger>
-                  <TabsTrigger value="gainers" className="data-[state=active]:bg-white data-[state=active]:text-primary">
+                  <TabsTrigger value="gainers" className="data-[state=active]:bg-white data-[state=active]:text-primary flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4" />
                     Rising
                   </TabsTrigger>
-                  <TabsTrigger value="losers" className="data-[state=active]:bg-white data-[state=active]:text-primary">
+                  <TabsTrigger value="losers" className="data-[state=active]:bg-white data-[state=active]:text-primary flex items-center gap-2">
+                    <TrendingDown className="h-4 w-4" />
                     Falling
                   </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="all" className="mt-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {/* Popular NFT Collections - Always First */}
+                    {popularNFTs.map((nft) => {
+                      const isPositive = nft.price_change_percentage_24h >= 0;
+                      return (
+                        <Link
+                          key={nft.id}
+                          to="/markets"
+                          className="group bg-white border border-gray-200 rounded-lg p-4 hover:border-primary/50 hover:shadow-md transition-all"
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={nft.image}
+                                alt={nft.name}
+                                className="w-8 h-8 rounded-full object-cover"
+                                onError={(e) => {
+                                  // Fallback to default logo if image fails to load
+                                  (e.target as HTMLImageElement).src = "https://imgur.com/W3nzK2S";
+                                }}
+                              />
+                              <div>
+                                <div className="font-semibold text-gray-900 text-sm">
+                                  {nft.symbol.toUpperCase()}
+                                </div>
+                                <div className="text-xs text-gray-500">{nft.name}</div>
+                              </div>
+                            </div>
+                            {isPositive ? (
+                              <TrendingUp className="h-4 w-4 text-[#2463eb]" />
+                            ) : (
+                              <TrendingDown className="h-4 w-4 text-red-500" />
+                            )}
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="text-sm font-mono font-semibold text-gray-900">
+                                ${nft.current_price.toLocaleString(undefined, {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })}
+                              </div>
+                            </div>
+                            <div
+                              className={`text-sm font-semibold ${
+                                isPositive ? "text-[#2463eb]" : "text-red-500"
+                              }`}
+                            >
+                              {isPositive ? "+" : ""}
+                              {nft.price_change_percentage_24h.toFixed(2)}%
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                    {/* Crypto Markets */}
                     {markets.map((market) => {
                       const isPositive = market.price_change_percentage_24h >= 0;
                       return (
@@ -197,6 +285,51 @@ const Index = () => {
 
                 <TabsContent value="gainers" className="mt-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {/* Rising NFTs - First */}
+                    {popularNFTs
+                      .filter((nft) => nft.price_change_percentage_24h >= 0)
+                      .sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h)
+                      .map((nft) => (
+                        <Link
+                          key={nft.id}
+                          to="/markets"
+                          className="group bg-white border border-gray-200 rounded-lg p-4 hover:border-primary/50 hover:shadow-md transition-all"
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={nft.image}
+                                alt={nft.name}
+                                className="w-8 h-8 rounded-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = "https://imgur.com/W3nzK2S";
+                                }}
+                              />
+                              <div>
+                                <div className="font-semibold text-gray-900 text-sm">
+                                  {nft.symbol.toUpperCase()}
+                                </div>
+                                <div className="text-xs text-gray-500">{nft.name}</div>
+                              </div>
+                            </div>
+                            <TrendingUp className="h-4 w-4 text-[#2463eb]" />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="text-sm font-mono font-semibold text-gray-900">
+                                ${nft.current_price.toLocaleString(undefined, {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })}
+                              </div>
+                            </div>
+                            <div className="text-sm font-semibold text-[#2463eb]">
+                              +{nft.price_change_percentage_24h.toFixed(2)}%
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    {/* Rising Crypto Markets */}
                     {markets
                       .filter((m) => m.price_change_percentage_24h >= 0)
                       .sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h)
@@ -242,6 +375,51 @@ const Index = () => {
 
                 <TabsContent value="losers" className="mt-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {/* Falling NFTs - First */}
+                    {popularNFTs
+                      .filter((nft) => nft.price_change_percentage_24h < 0)
+                      .sort((a, b) => a.price_change_percentage_24h - b.price_change_percentage_24h)
+                      .map((nft) => (
+                        <Link
+                          key={nft.id}
+                          to="/markets"
+                          className="group bg-white border border-gray-200 rounded-lg p-4 hover:border-primary/50 hover:shadow-md transition-all"
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={nft.image}
+                                alt={nft.name}
+                                className="w-8 h-8 rounded-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = "https://imgur.com/W3nzK2S";
+                                }}
+                              />
+                              <div>
+                                <div className="font-semibold text-gray-900 text-sm">
+                                  {nft.symbol.toUpperCase()}
+                                </div>
+                                <div className="text-xs text-gray-500">{nft.name}</div>
+                              </div>
+                            </div>
+                            <TrendingDown className="h-4 w-4 text-red-500" />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="text-sm font-mono font-semibold text-gray-900">
+                                ${nft.current_price.toLocaleString(undefined, {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })}
+                              </div>
+                            </div>
+                            <div className="text-sm font-semibold text-red-500">
+                              {nft.price_change_percentage_24h.toFixed(2)}%
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    {/* Falling Crypto Markets */}
                     {markets
                       .filter((m) => m.price_change_percentage_24h < 0)
                       .sort((a, b) => a.price_change_percentage_24h - b.price_change_percentage_24h)
@@ -286,9 +464,11 @@ const Index = () => {
                 </TabsContent>
               </Tabs>
             ) : (
-              <div className="text-center py-12 text-gray-500">
-                No market data available
-              </div>
+              <EmptyState 
+                type="crypto" 
+                title="No Market Data Available"
+                description="Unable to load market data at the moment. Please try refreshing or check back later."
+              />
             )}
           </div>
         </motion.div>

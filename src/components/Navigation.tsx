@@ -51,7 +51,7 @@ const Navigation = () => {
           <Link to="/" className="px-4 py-6 border-b border-border">
             <div className="flex items-center gap-3">
               <img
-                src={"/assets/favicon.png"}
+                src={"/favicon.png"}
                 alt="Trade Premium Logo"
                 className={`object-cover shrink-0 transition-all duration-300 ${
                   isOpen

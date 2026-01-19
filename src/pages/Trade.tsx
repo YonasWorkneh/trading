@@ -214,7 +214,7 @@ const Trade = () => {
 
   const [tradingMode, setTradingMode] = useState<
     "spot" | "futures" | "contract"
-  >("spot");
+  >("contract");
 
   // Get current asset ID for filtering trades
   const currentAssetId =

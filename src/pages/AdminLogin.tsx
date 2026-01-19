@@ -14,8 +14,8 @@ import { toast } from "sonner";
 import { ShieldCheck } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-const ADMIN_EMAIL = "admin@bexprot.com";
-const ADMIN_PASSWORD = "mmmmmm";
+const ADMIN_EMAIL = "admin@tradepremium.com";
+const ADMIN_PASSWORD = "admin123";
 const ADMIN_SESSION_KEY = "admin_session";
 const ADMIN_SESSION_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
 
@@ -301,8 +301,6 @@ const AdminLogin = () => {
             );
           }
 
-          console.log("profile", profile);
-
           if (profile?.role?.toLowerCase() === "admin") {
             toast.success("Admin access granted");
             storeAdminSession(data.user.id, data.user.email || email);
@@ -363,7 +361,7 @@ const AdminLogin = () => {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@bexprot.com"
+                placeholder="admin@tradepremium.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

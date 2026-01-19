@@ -115,98 +115,222 @@ const AdminSendsPanel = () => {
                 </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-                <Table>
-                    <TableHeader className="bg-muted/50">
-                        <TableRow>
-                            <TableHead className="pl-6">User</TableHead>
-                            <TableHead>Amount</TableHead>
-                            <TableHead>Network / Recipient</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right pr-6">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {sends.map((send) => (
-                            <TableRow key={send.id} className="hover:bg-muted/30 transition-colors">
-                                <TableCell className="pl-6 font-medium">
-                                    <div>
-                                        <div className="font-semibold">{send.user?.name || 'Unknown'}</div>
-                                        <div className="text-xs text-muted-foreground">{send.user?.email}</div>
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <div className="font-mono font-bold">${send.amount.toFixed(2)}</div>
-                                    {send.fee > 0 && (
-                                        <div className="text-[10px] text-muted-foreground">Fee: ${send.fee.toFixed(2)}</div>
-                                    )}
-                                </TableCell>
-                                <TableCell>
-                                    <div className="text-sm">
-                                        <span className="font-semibold">{send.network}</span>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-1 rounded select-all truncate max-w-[150px]">
-                                                {send.address}
+                {/* Desktop Table View - Hidden on mobile */}
+                <div className="hidden md:block">
+                    <Table>
+                        <TableHeader className="bg-muted/50">
+                            <TableRow>
+                                <TableHead className="pl-6">User</TableHead>
+                                <TableHead>Amount</TableHead>
+                                <TableHead>Network / Recipient</TableHead>
+                                <TableHead>Date</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead className="text-right pr-6">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {sends.map((send) => (
+                                <TableRow key={send.id} className="hover:bg-muted/30 transition-colors">
+                                    <TableCell className="pl-6 font-medium">
+                                        <div>
+                                            <div className="font-semibold">{send.user?.name || 'Unknown'}</div>
+                                            <div className="text-xs text-muted-foreground">{send.user?.email}</div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="font-mono font-bold">${send.amount.toFixed(2)}</div>
+                                        {send.fee > 0 && (
+                                            <div className="text-[10px] text-muted-foreground">Fee: ${send.fee.toFixed(2)}</div>
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="text-sm">
+                                            <span className="font-semibold">{send.network}</span>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-1 rounded select-all truncate max-w-[150px]">
+                                                    {send.address}
+                                                </div>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6"
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(send.address);
+                                                        toast.success("Address copied");
+                                                    }}
+                                                >
+                                                    <Copy className="h-3 w-3" />
+                                                </Button>
                                             </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-6 w-6"
-                                                onClick={() => {
-                                                    navigator.clipboard.writeText(send.address);
-                                                    toast.success("Address copied");
-                                                }}
-                                            >
-                                                <Copy className="h-3 w-3" />
-                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="text-sm text-muted-foreground">
+                                            {new Date(send.created_at).toLocaleDateString()}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge className={`capitalize ${send.status === 'completed' ? 'bg-green-500/15 text-green-600 border-green-200' :
+                                            send.status === 'pending' ? 'bg-yellow-500/15 text-yellow-600 border-yellow-200' :
+                                                'bg-red-500/15 text-red-600 border-red-200'
+                                            }`} variant="outline">
+                                            {send.status}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-right pr-6">
+                                        {send.status === 'pending' && (
+                                            <div className="flex justify-end gap-2">
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
+                                                    onClick={() => handleStatusUpdate(send.id, 'rejected', send.amount, send.user_id, send.network)}
+                                                >
+                                                    <XCircle className="w-4 h-4" />
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white"
+                                                    onClick={() => handleStatusUpdate(send.id, 'completed', send.amount, send.user_id, send.network)}
+                                                >
+                                                    <CheckCircle className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                            {sends.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                                        No send requests found
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+
+                {/* Mobile Card View - Visible only on mobile */}
+                <div className="md:hidden space-y-4 p-4">
+                    {sends.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                                <Send className="w-8 h-8 opacity-20" />
+                            </div>
+                            <p className="text-lg font-medium">No send requests found</p>
+                        </div>
+                    ) : (
+                        sends.map((send) => (
+                            <Card
+                                key={send.id}
+                                className="border-border bg-card hover:border-primary/50 transition-colors"
+                            >
+                                <CardContent className="p-4 space-y-4">
+                                    {/* Header Section */}
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="font-semibold text-foreground truncate">
+                                                {send.user?.name || 'Unknown'}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground truncate">
+                                                {send.user?.email}
+                                            </div>
+                                        </div>
+                                        <Badge
+                                            className={`capitalize flex-shrink-0 ${
+                                                send.status === 'completed'
+                                                    ? 'bg-green-500/15 text-green-600 border-green-200'
+                                                    : send.status === 'pending'
+                                                    ? 'bg-yellow-500/15 text-yellow-600 border-yellow-200'
+                                                    : 'bg-red-500/15 text-red-600 border-red-200'
+                                            }`}
+                                            variant="outline"
+                                        >
+                                            {send.status}
+                                        </Badge>
+                                    </div>
+
+                                    {/* Amount Section */}
+                                    <div className="pt-2 border-t border-border">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs text-muted-foreground">Amount</span>
+                                            <div className="text-right">
+                                                <div className="font-mono font-bold text-foreground">
+                                                    ${send.amount.toFixed(2)}
+                                                </div>
+                                                {send.fee > 0 && (
+                                                    <div className="text-xs text-muted-foreground">
+                                                        Fee: ${send.fee.toFixed(2)}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </TableCell>
-                                <TableCell>
-                                    <div className="text-sm text-muted-foreground">
-                                        {new Date(send.created_at).toLocaleDateString()}
+
+                                    {/* Network & Recipient Address Section */}
+                                    <div className="space-y-2 pt-2 border-t border-border">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs text-muted-foreground">Network</span>
+                                            <span className="text-sm font-semibold">{send.network}</span>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <span className="text-xs text-muted-foreground">Recipient Address</span>
+                                            <div className="flex items-center gap-2">
+                                                <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-2 rounded select-all break-all">
+                                                    {send.address}
+                                                </div>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 flex-shrink-0"
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(send.address);
+                                                        toast.success("Address copied");
+                                                    }}
+                                                    title="Copy Address"
+                                                >
+                                                    <Copy className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
                                     </div>
-                                </TableCell>
-                                <TableCell>
-                                    <Badge className={`capitalize ${send.status === 'completed' ? 'bg-green-500/15 text-green-600 border-green-200' :
-                                        send.status === 'pending' ? 'bg-yellow-500/15 text-yellow-600 border-yellow-200' :
-                                            'bg-red-500/15 text-red-600 border-red-200'
-                                        }`} variant="outline">
-                                        {send.status}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="text-right pr-6">
+
+                                    {/* Date Section */}
+                                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                                        <span className="text-xs text-muted-foreground">Date</span>
+                                        <span className="text-sm text-muted-foreground">
+                                            {new Date(send.created_at).toLocaleDateString()}
+                                        </span>
+                                    </div>
+
+                                    {/* Action Buttons */}
                                     {send.status === 'pending' && (
-                                        <div className="flex justify-end gap-2">
+                                        <div className="flex gap-2 pt-2">
                                             <Button
                                                 size="sm"
                                                 variant="outline"
-                                                className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
+                                                className="flex-1 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
                                                 onClick={() => handleStatusUpdate(send.id, 'rejected', send.amount, send.user_id, send.network)}
                                             >
-                                                <XCircle className="w-4 h-4" />
+                                                <XCircle className="w-4 h-4 mr-2" />
+                                                Reject
                                             </Button>
                                             <Button
                                                 size="sm"
-                                                className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white"
+                                                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                                                 onClick={() => handleStatusUpdate(send.id, 'completed', send.amount, send.user_id, send.network)}
                                             >
-                                                <CheckCircle className="w-4 h-4" />
+                                                <CheckCircle className="w-4 h-4 mr-2" />
+                                                Approve
                                             </Button>
                                         </div>
                                     )}
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                        {sends.length === 0 && (
-                            <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                                    No send requests found
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                                </CardContent>
+                            </Card>
+                        ))
+                    )}
+                </div>
             </CardContent>
         </Card>
     );

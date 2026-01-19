@@ -79,8 +79,8 @@ const ContractTimer = () => {
                   : contract.currentPrice < contract.entryPrice;
             }
 
-            const statusColor = isWinning ? "text-green-500" : "text-red-500";
-            const progressColor = isWinning ? "bg-green-500" : "bg-red-500";
+            const statusColor = isWinning ? "text-primary" : "text-red-500";
+            const progressColor = isWinning ? "bg-primary" : "bg-red-500";
 
             // Check if THIS contract is hidden (per-contract check)
             const isContractHidden = hiddenContractIds.includes(contract.id);
@@ -105,14 +105,14 @@ const ContractTimer = () => {
                 >
                   <Card
                     className={`p-3 border-l-4 ${
-                      isWinning ? "border-l-green-500" : "border-l-red-500"
+                      isWinning ? "border-l-primary" : "border-l-red-500"
                     } shadow-lg bg-card/95 backdrop-blur-sm`}
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center gap-2">
                         {contract.side === "buy" ? (
-                          <div className="bg-green-500/10 p-1 rounded">
-                            <TrendingUp className="w-4 h-4 text-green-500" />
+                          <div className="bg-primary/10 p-1 rounded">
+                            <TrendingUp className="w-4 h-4 text-primary" />
                           </div>
                         ) : (
                           <div className="bg-red-500/10 p-1 rounded">
@@ -172,7 +172,7 @@ const ContractTimer = () => {
                 {/* Background Glow */}
                 <div
                   className={`absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-10 ${
-                    isWinning ? "bg-green-500" : "bg-red-500"
+                    isWinning ? "bg-primary" : "bg-red-500"
                   }`}
                 />
 
@@ -183,7 +183,7 @@ const ContractTimer = () => {
                       <span
                         className={`text-sm px-2 py-0.5 rounded-full ${
                           contract.side === "buy"
-                            ? "bg-green-500/20 text-green-500"
+                            ? "bg-primary/20 text-primary"
                             : "bg-red-500/20 text-red-500"
                         }`}
                       >
@@ -246,9 +246,9 @@ const ContractTimer = () => {
       <AnimatePresence>
         {completedContracts?.map((contract) => {
           const isWinning = contract.finalResult === "win";
-          const statusColor = isWinning ? "text-green-500" : "text-red-500";
-          const bgColor = isWinning ? "bg-green-500/10" : "bg-red-500/10";
-          const borderColor = isWinning ? "border-green-500" : "border-red-500";
+          const statusColor = isWinning ? "text-primary" : "text-red-500";
+          const bgColor = isWinning ? "bg-primary/10" : "bg-red-500/10";
+          const borderColor = isWinning ? "border-primary" : "border-red-500";
 
           return (
             <motion.div
@@ -266,7 +266,7 @@ const ContractTimer = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => dismissCompletedContract(contract.id)}
-                  className="absolute top-4 right-4 h-8 w-8 hover:bg-secondary z-20"
+                  className="absolute top-4 right-4 h-8 w-8 text-white hover:bg-white hover:text-primary z-20"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -274,19 +274,19 @@ const ContractTimer = () => {
                 {/* Background Glow */}
                 <div
                   className={`absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-20 ${
-                    isWinning ? "bg-green-500" : "bg-red-500"
+                    isWinning ? "bg-primary" : "bg-red-500"
                   }`}
                 />
                 <div
                   className={`absolute -bottom-20 -left-20 w-40 h-40 rounded-full blur-3xl opacity-20 ${
-                    isWinning ? "bg-green-500" : "bg-red-500"
+                    isWinning ? "bg-primary" : "bg-red-500"
                   }`}
                 />
 
                 <div className="relative z-10 flex flex-col items-center text-center">
                   <div
                     className={`mb-4 p-4 rounded-full ${
-                      isWinning ? "bg-green-500/20" : "bg-red-500/20"
+                      isWinning ? "bg-primary/20" : "bg-red-500/20"
                     }`}
                   >
                     {isWinning ? (
@@ -306,16 +306,16 @@ const ContractTimer = () => {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 w-full mb-6">
-                    <div className="bg-background/50 p-3 rounded-lg border border-border">
-                      <div className="text-xs text-muted-foreground mb-1">
+                    <div className="bg-background p-3 rounded-lg border border-border">
+                      <div className="text-xs mb-1">
                         Investment
                       </div>
                       <div className="font-mono font-semibold text-lg">
                         ${contract.initialInvestment?.toFixed(2)}
                       </div>
                     </div>
-                    <div className="bg-background/50 p-3 rounded-lg border border-border">
-                      <div className="text-xs text-muted-foreground mb-1">
+                    <div className="bg-background p-3 rounded-lg border border-border">
+                      <div className="text-xs mb-1">
                         Payout
                       </div>
                       <div
@@ -328,12 +328,12 @@ const ContractTimer = () => {
                     </div>
                   </div>
 
-                  <div className="w-full bg-background/50 p-3 rounded-lg border border-border mb-6 flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Entry Price</span>
+                  <div className="w-full bg-background p-3 rounded-lg border border-border mb-6 flex justify-between items-center text-sm">
+                    <span className="">Entry Price</span>
                     <span className="font-mono">{contract.entryPrice}</span>
                   </div>
-                  <div className="w-full bg-background/50 p-3 rounded-lg border border-border mb-6 flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Close Price</span>
+                  <div className="w-full bg-background p-3 rounded-lg border border-border mb-6 flex justify-between items-center text-sm">
+                    <span className="">Close Price</span>
                     <span className="font-mono">{contract.currentPrice}</span>
                   </div>
                 </div>

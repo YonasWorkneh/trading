@@ -1,8 +1,8 @@
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { CryptoAsset } from "@/lib/coingecko";
+import { CryptoAsset, NFTMarketData } from "@/lib/coingecko";
 
 interface PriceCardProps {
-  asset: CryptoAsset;
+  asset: CryptoAsset | NFTMarketData;
   onClick?: () => void;
 }
 

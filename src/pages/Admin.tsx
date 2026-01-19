@@ -41,14 +41,23 @@ import {
   ArrowUpFromLine,
   Settings,
   RefreshCw,
+  Menu,
+  MessageCircle,
+  Send,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import AdminDepositsPanel from "@/components/AdminDepositsPanel";
 import AdminWithdrawalsPanel from "@/components/AdminWithdrawalsPanel";
 import AdminSendsPanel from "@/components/AdminSendsPanel";
 import AdminSettingsPanel from "@/components/AdminSettingsPanel";
 import AdminSupportPanel from "@/components/AdminSupportPanel";
-import { MessageCircle, Send } from "lucide-react";
 
 interface UserData {
   id: string;
@@ -90,6 +99,8 @@ const Admin = () => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [adjustAmount, setAdjustAmount] = useState("");
   const [adjustType, setAdjustType] = useState<"credit" | "debit">("credit");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("users");
   const navigate = useNavigate();
 
   // Fetch users with React Query
@@ -498,33 +509,129 @@ const Admin = () => {
           </Button>
         </div>
 
-        <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full max-w-2xl grid-cols-6">
-            <TabsTrigger value="users">
-              <User className="w-4 h-4 mr-2" />
-              Users & KYC
-            </TabsTrigger>
-            <TabsTrigger value="deposits">
-              <Coins className="w-4 h-4 mr-2" />
-              Deposits
-            </TabsTrigger>
-            <TabsTrigger value="withdrawals">
-              <ArrowUpFromLine className="w-4 h-4 mr-2" />
-              Withdrawals
-            </TabsTrigger>
-            <TabsTrigger value="sends">
-              <Send className="w-4 h-4 mr-2" />
-              Sends
-            </TabsTrigger>
-            <TabsTrigger value="settings">
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
-            </TabsTrigger>
-            <TabsTrigger value="support">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Support
-            </TabsTrigger>
-          </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          {/* Desktop Tabs - Hidden on mobile */}
+          <div className="hidden md:block">
+            <TabsList className="grid w-full max-w-2xl grid-cols-6 gap-2">
+              <TabsTrigger value="users" className="flex items-center justify-center">
+                <User className="w-4 h-4 mr-2" />
+                Users & KYC
+              </TabsTrigger>
+              <TabsTrigger value="deposits" className="flex items-center justify-center">
+                <Coins className="w-4 h-4 mr-2" />
+                Deposits
+              </TabsTrigger>
+              <TabsTrigger value="withdrawals" className="flex items-center justify-center">
+                <ArrowUpFromLine className="w-4 h-4 mr-2" />
+                Withdrawals
+              </TabsTrigger>
+          
+              <TabsTrigger value="settings" className="flex items-center justify-center">
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </TabsTrigger>
+              <TabsTrigger value="support" className="flex items-center justify-center">
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Support
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          {/* Mobile Hamburger Menu */}
+          <div className="md:hidden">
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="gap-2 w-full justify-start">
+                  <Menu className="h-5 w-5" />
+                  <span className="font-semibold">Menu</span>
+                  <Badge variant="secondary" className="ml-auto">
+                    {activeTab === "users" && "Users & KYC"}
+                    {activeTab === "deposits" && "Deposits"}
+                    {activeTab === "withdrawals" && "Withdrawals"}
+                    {activeTab === "settings" && "Settings"}
+                    {activeTab === "support" && "Support"}
+                  </Badge>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[280px] sm:w-[320px]">
+                <SheetHeader>
+                  <SheetTitle>Admin Menu</SheetTitle>
+                </SheetHeader>
+                <div className="mt-6 space-y-2">
+                  <Button
+                    variant={activeTab === "users" ? "default" : "ghost"}
+                    className="w-full justify-start gap-3 h-auto py-3"
+                    onClick={() => {
+                      setActiveTab("users");
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <User className="w-5 h-5" />
+                    <div className="flex flex-col items-start">
+                      <span className="font-semibold">Users & KYC</span>
+                      <span className="text-xs text-white">Manage users and KYC</span>
+                    </div>
+                  </Button>
+                  <Button
+                    variant={activeTab === "deposits" ? "default" : "ghost"}
+                    className="w-full justify-start gap-3 h-auto py-3"
+                    onClick={() => {
+                      setActiveTab("deposits");
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <Coins className="w-5 h-5" />
+                    <div className="flex flex-col items-start">
+                      <span className="font-semibold">Deposits</span>
+                      <span className="text-xs text-white">View deposit requests</span>
+                    </div>
+                  </Button>
+                  <Button
+                    variant={activeTab === "withdrawals" ? "default" : "ghost"}
+                    className="w-full justify-start gap-3 h-auto py-3"
+                    onClick={() => {
+                      setActiveTab("withdrawals");
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <ArrowUpFromLine className="w-5 h-5" />
+                    <div className="flex flex-col items-start">
+                      <span className="font-semibold">Withdrawals</span>
+                      <span className="text-xs text-white">Process withdrawals</span>
+                    </div>
+                  </Button>
+                  <Button
+                    variant={activeTab === "settings" ? "default" : "ghost"}
+                    className="w-full justify-start gap-3 h-auto py-3"
+                    onClick={() => {
+                      setActiveTab("settings");
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <Settings className="w-5 h-5" />
+                    <div className="flex flex-col items-start">
+                      <span className="font-semibold">Settings</span>
+                      <span className="text-xs text-white">System configuration</span>
+                    </div>
+                  </Button>
+                  <Button
+                    variant={activeTab === "support" ? "default" : "ghost"}
+                    className="w-full justify-start gap-3 h-auto py-3"
+                    onClick={() => {
+                      setActiveTab("support");
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    <div className="flex flex-col items-start">
+                      <span className="font-semibold">Support</span>
+                      <span className="text-xs text-muted-foreground">Customer support</span>
+                    </div>
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
 
           <TabsContent value="users" className="space-y-6">
             <Card className="border-border bg-card shadow-lg">
@@ -553,7 +660,8 @@ const Admin = () => {
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="rounded-none border-0">
+                {/* Desktop Table View - Hidden on mobile */}
+                <div className="hidden md:block rounded-none border-0">
                   <Table>
                     <TableHeader className="bg-muted/50">
                       <TableRow>
@@ -684,6 +792,138 @@ const Admin = () => {
                     </TableBody>
                   </Table>
                 </div>
+
+                {/* Mobile Card View - Visible only on mobile */}
+                <div className="md:hidden space-y-4 p-4">
+                  {users.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                      <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                        <User className="w-8 h-8 opacity-20" />
+                      </div>
+                      <p className="text-lg font-medium">No users found</p>
+                      <p className="text-sm">
+                        New registrations will appear here.
+                      </p>
+                    </div>
+                  ) : (
+                    users.map((user) => (
+                      <Card
+                        key={user.id}
+                        className="border-border bg-card hover:border-primary/50 transition-colors"
+                      >
+                        <CardContent className="p-4 space-y-4">
+                          {/* User Profile Section */}
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-3 flex-1">
+                              {user.avatar_url ? (
+                                <img
+                                  src={user.avatar_url}
+                                  alt={user.name}
+                                  className="w-12 h-12 rounded-full object-cover border-2 border-background shadow-sm"
+                                />
+                              ) : (
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-primary font-bold border-2 border-background shadow-sm">
+                                  {user.name?.charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <div className="font-semibold text-foreground truncate">
+                                  {user.name || "Unknown User"}
+                                </div>
+                                <div className="text-xs text-muted-foreground capitalize">
+                                  {user.role || "user"}
+                                </div>
+                              </div>
+                            </div>
+                            <Badge
+                              className={`capitalize px-3 py-1 flex-shrink-0 ${
+                                user.kyc_status === "verified"
+                                  ? "bg-green-500/15 text-green-600 hover:bg-green-500/25 border-green-200"
+                                  : user.kyc_status === "pending"
+                                  ? "bg-yellow-500/15 text-yellow-600 hover:bg-yellow-500/25 border-yellow-200"
+                                  : user.kyc_status === "rejected"
+                                  ? "bg-red-500/15 text-red-600 hover:bg-red-500/25 border-red-200"
+                                  : "bg-slate-100 text-slate-600 border-slate-200"
+                              }`}
+                              variant="outline"
+                            >
+                              {user.kyc_status === "verified" && (
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                              )}
+                              {user.kyc_status === "pending" && (
+                                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                              )}
+                              {user.kyc_status === "rejected" && (
+                                <XCircle className="w-3 h-3 mr-1" />
+                              )}
+                              <span className="hidden sm:inline">
+                                {(user.kyc_status || "not_started").replace(
+                                  "_",
+                                  " "
+                                )}
+                              </span>
+                              <span className="sm:hidden">
+                                {(user.kyc_status || "not_started")
+                                  .replace("_", " ")
+                                  .split(" ")[0]}
+                              </span>
+                            </Badge>
+                          </div>
+
+                          {/* Contact Info */}
+                          <div className="space-y-2 pt-2 border-t border-border">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-muted-foreground">
+                                Email
+                              </span>
+                              <span className="text-sm text-foreground truncate ml-2 text-right max-w-[60%]">
+                                {user.email}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-muted-foreground">
+                                Joined
+                              </span>
+                              <span className="text-sm text-muted-foreground">
+                                {new Date(user.created_at).toLocaleDateString(
+                                  undefined,
+                                  {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  }
+                                )}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Action Button */}
+                          <div className="pt-2">
+                            <Button
+                              size="sm"
+                              variant={
+                                user.kyc_status === "pending"
+                                  ? "default"
+                                  : "outline"
+                              }
+                              className={`w-full ${
+                                user.kyc_status === "pending"
+                                  ? "bg-primary text-primary-foreground shadow-sm"
+                                  : ""
+                              }`}
+                              onClick={() => handleViewDetails(user)}
+                            >
+                              <Eye className="w-4 h-4 mr-2" />
+                              {user.kyc_status === "pending"
+                                ? "Review KYC"
+                                : "View Details"}
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -710,7 +950,7 @@ const Admin = () => {
         </Tabs>
 
         <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] md:w-full">
             <DialogHeader>
               <DialogTitle>User Details</DialogTitle>
               <DialogDescription>
@@ -720,63 +960,69 @@ const Admin = () => {
 
             {selectedUser && (
               <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-4">
-                  <TabsTrigger value="overview">Overview & KYC</TabsTrigger>
-                  <TabsTrigger value="trading">Trading Activity</TabsTrigger>
-                  <TabsTrigger value="finance">Finance & Wallet</TabsTrigger>
-                </TabsList>
+                <div className="overflow-x-auto -mx-4 px-4 mb-4">
+                  <TabsList className="inline-flex w-full min-w-max md:grid md:grid-cols-3 gap-2">
+                    <TabsTrigger value="overview" className="flex-shrink-0 whitespace-nowrap">
+                      <span className="hidden sm:inline">Overview & KYC</span>
+                      <span className="sm:hidden">Overview</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="trading" className="flex-shrink-0 whitespace-nowrap">
+                      <span className="hidden sm:inline">Trading Activity</span>
+                      <span className="sm:hidden">Trading</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="finance" className="flex-shrink-0 whitespace-nowrap">
+                      <span className="hidden sm:inline">Finance & Wallet</span>
+                      <span className="sm:hidden">Finance</span>
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
 
                 <TabsContent value="overview" className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <h3 className="font-semibold mb-2">Account Info</h3>
-                      <div className="space-y-1 text-sm">
-                        <p>
-                          <span className="text-muted-foreground">Name:</span>{" "}
-                          {selectedUser.name}
-                        </p>
-                        <p>
-                          <span className="text-muted-foreground">Email:</span>{" "}
-                          {selectedUser.email}
-                        </p>
-                        <p>
-                          <span className="text-muted-foreground">Joined:</span>{" "}
-                          {new Date(selectedUser.created_at).toLocaleString()}
-                        </p>
-                        <p>
-                          <span className="text-muted-foreground">Status:</span>{" "}
-                          {selectedUser.kyc_status}
-                        </p>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                          <span className="text-muted-foreground font-medium min-w-[80px]">Name:</span>
+                          <span className="text-foreground">{selectedUser.name}</span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                          <span className="text-muted-foreground font-medium min-w-[80px]">Email:</span>
+                          <span className="text-foreground break-all">{selectedUser.email}</span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                          <span className="text-muted-foreground font-medium min-w-[80px]">Joined:</span>
+                          <span className="text-foreground">{new Date(selectedUser.created_at).toLocaleString()}</span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                          <span className="text-muted-foreground font-medium min-w-[80px]">Status:</span>
+                          <Badge variant="outline" className="capitalize w-fit">
+                            {selectedUser.kyc_status}
+                          </Badge>
+                        </div>
                       </div>
                     </div>
 
                     {kycDetails && (
                       <div>
                         <h3 className="font-semibold mb-2">Personal Info</h3>
-                        <div className="space-y-1 text-sm">
-                          <p>
-                            <span className="text-muted-foreground">
-                              Full Name:
-                            </span>{" "}
-                            {kycDetails.full_name}
-                          </p>
-                          <p>
-                            <span className="text-muted-foreground">DOB:</span>{" "}
-                            {kycDetails.date_of_birth}
-                          </p>
-                          <p>
-                            <span className="text-muted-foreground">
-                              Nationality:
-                            </span>{" "}
-                            {kycDetails.nationality}
-                          </p>
-                          <p>
-                            <span className="text-muted-foreground">
-                              Address:
-                            </span>{" "}
-                            {kycDetails.address_line}, {kycDetails.city},{" "}
-                            {kycDetails.country}
-                          </p>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                            <span className="text-muted-foreground font-medium min-w-[100px]">Full Name:</span>
+                            <span className="text-foreground">{kycDetails.full_name}</span>
+                          </div>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                            <span className="text-muted-foreground font-medium min-w-[100px]">DOB:</span>
+                            <span className="text-foreground">{kycDetails.date_of_birth}</span>
+                          </div>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                            <span className="text-muted-foreground font-medium min-w-[100px]">Nationality:</span>
+                            <span className="text-foreground">{kycDetails.nationality}</span>
+                          </div>
+                          <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
+                            <span className="text-muted-foreground font-medium min-w-[100px]">Address:</span>
+                            <span className="text-foreground">{kycDetails.address_line}, {kycDetails.city}, {kycDetails.country}</span>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -791,7 +1037,7 @@ const Admin = () => {
                       <h3 className="font-semibold border-b pb-2">
                         KYC Documents
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
                           <p className="text-sm font-medium">ID Front</p>
                           {kycDetails.id_front_url ? (
@@ -857,10 +1103,10 @@ const Admin = () => {
                         </div>
                       </div>
 
-                      <div className="flex justify-end gap-3 pt-4 border-t">
+                      <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
                         <Button
                           variant="outline"
-                          className="text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
+                          className="text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200 w-full sm:w-auto"
                           onClick={() =>
                             updateKycStatus(selectedUser.id, "rejected")
                           }
@@ -870,7 +1116,7 @@ const Admin = () => {
                           Reject KYC
                         </Button>
                         <Button
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
                           onClick={() =>
                             updateKycStatus(selectedUser.id, "verified")
                           }
@@ -890,7 +1136,7 @@ const Admin = () => {
                 </TabsContent>
 
                 <TabsContent value="trading" className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Card>
                       <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium">
@@ -924,7 +1170,8 @@ const Admin = () => {
                         <FileText className="w-4 h-4 text-primary" />
                         History
                       </h3>
-                      <div className="rounded-md border overflow-hidden">
+                      {/* Desktop Table View */}
+                      <div className="hidden md:block rounded-md border overflow-hidden">
                         <Table>
                           <TableHeader className="bg-muted/50">
                             <TableRow>
@@ -1020,6 +1267,100 @@ const Admin = () => {
                           </TableBody>
                         </Table>
                       </div>
+
+                      {/* Mobile Card View */}
+                      <div className="md:hidden space-y-3">
+                        {userDetails?.trades?.length > 0 ? (
+                          userDetails.trades.map((trade: any) => (
+                            <Card key={trade.id} className="border-border">
+                              <CardContent className="p-4 space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <div className="font-semibold text-lg">
+                                    {trade.asset?.toUpperCase() || "N/A"}
+                                  </div>
+                                  <Badge
+                                    variant={
+                                      trade.type === "buy"
+                                        ? "default"
+                                        : "destructive"
+                                    }
+                                    className="capitalize"
+                                  >
+                                    {trade.type}
+                                  </Badge>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
+                                  <div>
+                                    <span className="text-xs text-muted-foreground">Quantity</span>
+                                    <div className="text-sm font-medium">{trade.quantity || 0}</div>
+                                  </div>
+                                  <div>
+                                    <span className="text-xs text-muted-foreground">Price</span>
+                                    <div className="text-sm font-medium">${trade.price || 0}</div>
+                                  </div>
+                                  <div>
+                                    <span className="text-xs text-muted-foreground">Status</span>
+                                    <div className="mt-1">
+                                      {trade.status ? (
+                                        <Badge
+                                          variant={
+                                            trade.status === "win"
+                                              ? "default"
+                                              : trade.status === "loss"
+                                              ? "destructive"
+                                              : trade.status === "open"
+                                              ? "secondary"
+                                              : "outline"
+                                          }
+                                          className="capitalize text-xs"
+                                        >
+                                          {trade.status}
+                                        </Badge>
+                                      ) : (
+                                        <Badge variant="outline" className="text-xs">Completed</Badge>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <span className="text-xs text-muted-foreground">Profit</span>
+                                    <div className="text-sm font-medium">
+                                      {trade.profit !== null &&
+                                      trade.profit !== undefined ? (
+                                        <span
+                                          className={
+                                            trade.profit >= 0
+                                              ? "text-green-500"
+                                              : "text-red-500"
+                                          }
+                                        >
+                                          {trade.profit >= 0 ? "+" : ""}$
+                                          {Number(trade.profit).toFixed(2)}
+                                        </span>
+                                      ) : (
+                                        <span className="text-muted-foreground">-</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="pt-2 border-t border-border">
+                                  <span className="text-xs text-muted-foreground">Date</span>
+                                  <div className="text-xs text-muted-foreground mt-1">
+                                    {trade.timestamp
+                                      ? new Date(trade.timestamp).toLocaleString()
+                                      : trade.created_at
+                                      ? new Date(trade.created_at).toLocaleString()
+                                      : "N/A"}
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))
+                        ) : (
+                          <div className="text-center py-8 text-muted-foreground border rounded-lg">
+                            No trade history
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <div>
@@ -1027,7 +1368,8 @@ const Admin = () => {
                         <RefreshCw className="w-4 h-4 text-primary" />
                         Recent Trades
                       </h3>
-                      <div className="rounded-md border overflow-hidden">
+                      {/* Desktop Table View */}
+                      <div className="hidden md:block rounded-md border overflow-hidden">
                         <Table>
                           <TableHeader className="bg-muted/50">
                             <TableRow>
@@ -1075,6 +1417,53 @@ const Admin = () => {
                             )}
                           </TableBody>
                         </Table>
+                      </div>
+
+                      {/* Mobile Card View */}
+                      <div className="md:hidden space-y-3">
+                        {userDetails?.trades?.length > 0 ? (
+                          userDetails.trades.map((trade: any) => (
+                            <Card key={trade.id} className="border-border">
+                              <CardContent className="p-4 space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <div className="font-semibold text-lg">
+                                    {trade.asset?.toUpperCase()}
+                                  </div>
+                                  <Badge
+                                    variant={
+                                      trade.type === "buy"
+                                        ? "default"
+                                        : "destructive"
+                                    }
+                                    className="capitalize"
+                                  >
+                                    {trade.type}
+                                  </Badge>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
+                                  <div>
+                                    <span className="text-xs text-muted-foreground">Amount</span>
+                                    <div className="text-sm font-medium">{trade.quantity}</div>
+                                  </div>
+                                  <div>
+                                    <span className="text-xs text-muted-foreground">Price</span>
+                                    <div className="text-sm font-medium">${trade.price}</div>
+                                  </div>
+                                </div>
+                                <div className="pt-2 border-t border-border">
+                                  <span className="text-xs text-muted-foreground">Date</span>
+                                  <div className="text-xs text-muted-foreground mt-1">
+                                    {new Date(trade.timestamp).toLocaleString()}
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))
+                        ) : (
+                          <div className="text-center py-8 text-muted-foreground border rounded-lg">
+                            No recent trades
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1124,7 +1513,8 @@ const Admin = () => {
                         <FileText className="w-4 h-4 text-primary" />
                         Recent Transactions
                       </h3>
-                      <div className="rounded-md border overflow-hidden">
+                      {/* Desktop Table View */}
+                      <div className="hidden md:block rounded-md border overflow-hidden">
                         <Table>
                           <TableHeader className="bg-muted/50">
                             <TableRow>
@@ -1185,6 +1575,56 @@ const Admin = () => {
                           </TableBody>
                         </Table>
                       </div>
+
+                      {/* Mobile Card View */}
+                      <div className="md:hidden space-y-3">
+                        {userDetails?.transactions?.length > 0 ? (
+                          userDetails.transactions.map((tx: any) => (
+                            <Card key={tx.id} className="border-border">
+                              <CardContent className="p-4 space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <Badge
+                                    variant="outline"
+                                    className="capitalize"
+                                  >
+                                    {tx.type.replace("_", " ")}
+                                  </Badge>
+                                  <Badge
+                                    variant={
+                                      tx.status === "completed"
+                                        ? "default"
+                                        : "secondary"
+                                    }
+                                    className="capitalize"
+                                  >
+                                    {tx.status}
+                                  </Badge>
+                                </div>
+                                <div className="pt-2 border-t border-border">
+                                  <div className={`text-xl font-bold ${
+                                    tx.amount >= 0
+                                      ? "text-green-600"
+                                      : "text-red-600"
+                                  }`}>
+                                    {tx.amount >= 0 ? "+" : ""}
+                                    {tx.amount.toFixed(2)} USDT
+                                  </div>
+                                </div>
+                                <div className="pt-2 border-t border-border">
+                                  <span className="text-xs text-muted-foreground">Date</span>
+                                  <div className="text-xs text-muted-foreground mt-1">
+                                    {new Date(tx.timestamp).toLocaleString()}
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))
+                        ) : (
+                          <div className="text-center py-8 text-muted-foreground border rounded-lg">
+                            No recent transactions
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -1192,13 +1632,14 @@ const Admin = () => {
                     <h3 className="font-semibold text-foreground">
                       Adjust Balance
                     </h3>
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                       <div className="flex-1">
                         <Input
                           type="number"
                           placeholder="Amount"
                           value={adjustAmount}
                           onChange={(e) => setAdjustAmount(e.target.value)}
+                          className="w-full"
                         />
                       </div>
                       <Select
@@ -1207,7 +1648,7 @@ const Admin = () => {
                           setAdjustType(value)
                         }
                       >
-                        <SelectTrigger className="w-[140px]">
+                        <SelectTrigger className="w-full sm:w-[140px]">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -1217,6 +1658,7 @@ const Admin = () => {
                       </Select>
                       <Button
                         onClick={() => handleAdjustBalance(selectedUser.id)}
+                        className="w-full sm:w-auto"
                       >
                         Apply
                       </Button>

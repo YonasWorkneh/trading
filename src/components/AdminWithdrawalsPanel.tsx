@@ -168,97 +168,254 @@ const AdminWithdrawalsPanel = () => {
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <Table>
-          <TableHeader className="bg-muted/50">
-            <TableRow>
-              <TableHead className="pl-6">User</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Network / Address</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right pr-6">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {withdrawals.map((withdrawal) => (
-              <TableRow
-                key={withdrawal.id}
-                className="hover:bg-muted/30 transition-colors"
-              >
-                <TableCell className="pl-6 font-medium">
-                  <div>
-                    <div className="font-semibold">
-                      {withdrawal.user?.name || "Unknown"}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {withdrawal.user?.email}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="font-mono font-bold">
-                    ${withdrawal.amount.toFixed(2)}
-                  </div>
-                  {withdrawal.fee > 0 && (
-                    <div className="text-[10px] text-muted-foreground">
-                      Fee: ${withdrawal.fee.toFixed(2)}
-                    </div>
-                  )}
-                  <Badge
-                    variant="outline"
-                    className="text-[10px] py-0 h-4 mt-1"
-                  >
-                    {withdrawal.type || "withdrawal"}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="text-sm">
-                    <span className="font-semibold">{withdrawal.network}</span>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-1 rounded select-all">
-                        {withdrawal.address}
+        {/* Desktop Table View - Hidden on mobile */}
+        <div className="hidden md:block">
+          <Table>
+            <TableHeader className="bg-muted/50">
+              <TableRow>
+                <TableHead className="pl-6">User</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Network / Address</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right pr-6">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {withdrawals.map((withdrawal) => (
+                <TableRow
+                  key={withdrawal.id}
+                  className="hover:bg-muted/30 transition-colors"
+                >
+                  <TableCell className="pl-6 font-medium">
+                    <div>
+                      <div className="font-semibold">
+                        {withdrawal.user?.name || "Unknown"}
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => {
-                          navigator.clipboard.writeText(withdrawal.address);
-                          toast.success("Address copied");
-                        }}
-                        title="Copy Address"
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
+                      <div className="text-xs text-muted-foreground">
+                        {withdrawal.user?.email}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-mono font-bold">
+                      ${withdrawal.amount.toFixed(2)}
+                    </div>
+                    {withdrawal.fee > 0 && (
+                      <div className="text-[10px] text-muted-foreground">
+                        Fee: ${withdrawal.fee.toFixed(2)}
+                      </div>
+                    )}
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] py-0 h-4 mt-1"
+                    >
+                      {withdrawal.type || "withdrawal"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">
+                      <span className="font-semibold">{withdrawal.network}</span>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-1 rounded select-all">
+                          {withdrawal.address}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => {
+                            navigator.clipboard.writeText(withdrawal.address);
+                            toast.success("Address copied");
+                          }}
+                          title="Copy Address"
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm text-muted-foreground">
+                      {new Date(withdrawal.created_at).toLocaleDateString()}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      className={`capitalize ${
+                        withdrawal.status === "completed" || withdrawal.status === "approved"
+                          ? "bg-green-500/15 text-green-600 border-green-200"
+                          : withdrawal.status === "pending"
+                          ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
+                          : "bg-red-500/15 text-red-600 border-red-200"
+                      }`}
+                      variant="outline"
+                    >
+                      {withdrawal.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right pr-6">
+                    {withdrawal.status === "pending" && (
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
+                          onClick={() =>
+                            handleStatusUpdate(
+                              withdrawal.id,
+                              "rejected",
+                              withdrawal.amount,
+                              withdrawal.user_id,
+                              withdrawal.network
+                            )
+                          }
+                          title="Reject"
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white"
+                          onClick={() =>
+                            handleStatusUpdate(
+                              withdrawal.id,
+                              "completed",
+                              withdrawal.amount,
+                              withdrawal.user_id,
+                              withdrawal.network
+                            )
+                          }
+                          title="Approve"
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+              {withdrawals.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={6}
+                    className="text-center py-8 text-muted-foreground"
+                  >
+                    No withdrawal requests found
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Mobile Card View - Visible only on mobile */}
+        <div className="md:hidden space-y-4 p-4">
+          {withdrawals.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                <ArrowUpFromLine className="w-8 h-8 opacity-20" />
+              </div>
+              <p className="text-lg font-medium">No withdrawal requests found</p>
+            </div>
+          ) : (
+            withdrawals.map((withdrawal) => (
+              <Card
+                key={withdrawal.id}
+                className="border-border bg-card hover:border-primary/50 transition-colors"
+              >
+                <CardContent className="p-4 space-y-4">
+                  {/* Header Section */}
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-foreground truncate">
+                        {withdrawal.user?.name || "Unknown"}
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {withdrawal.user?.email}
+                      </div>
+                    </div>
+                    <Badge
+                      className={`capitalize flex-shrink-0 ${
+                        withdrawal.status === "completed" ||
+                        withdrawal.status === "approved"
+                          ? "bg-green-500/15 text-green-600 border-green-200"
+                          : withdrawal.status === "pending"
+                          ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
+                          : "bg-red-500/15 text-red-600 border-red-200"
+                      }`}
+                      variant="outline"
+                    >
+                      {withdrawal.status}
+                    </Badge>
+                  </div>
+
+                  {/* Amount Section */}
+                  <div className="pt-2 border-t border-border">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">Amount</span>
+                      <div className="text-right">
+                        <div className="font-mono font-bold text-foreground">
+                          ${withdrawal.amount.toFixed(2)}
+                        </div>
+                        {withdrawal.fee > 0 && (
+                          <div className="text-xs text-muted-foreground">
+                            Fee: ${withdrawal.fee.toFixed(2)}
+                          </div>
+                        )}
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] py-0 h-4 mt-1"
+                        >
+                          {withdrawal.type || "withdrawal"}
+                        </Badge>
+                      </div>
                     </div>
                   </div>
-                </TableCell>
-                <TableCell>
-                  <div className="text-sm text-muted-foreground">
-                    {new Date(withdrawal.created_at).toLocaleDateString()}
+
+                  {/* Network & Address Section */}
+                  <div className="space-y-2 pt-2 border-t border-border">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">Network</span>
+                      <span className="text-sm font-semibold">{withdrawal.network}</span>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-xs text-muted-foreground">Address</span>
+                      <div className="flex items-center gap-2">
+                        <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-2 rounded select-all break-all">
+                          {withdrawal.address}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 flex-shrink-0"
+                          onClick={() => {
+                            navigator.clipboard.writeText(withdrawal.address);
+                            toast.success("Address copied");
+                          }}
+                          title="Copy Address"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    className={`capitalize ${
-                      withdrawal.status === "completed" || withdrawal.status === "approved"
-                        ? "bg-green-500/15 text-green-600 border-green-200"
-                        : withdrawal.status === "pending"
-                        ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
-                        : "bg-red-500/15 text-red-600 border-red-200"
-                    }`}
-                    variant="outline"
-                  >
-                    {withdrawal.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right pr-6">
+
+                  {/* Date Section */}
+                  <div className="flex items-center justify-between pt-2 border-t border-border">
+                    <span className="text-xs text-muted-foreground">Date</span>
+                    <span className="text-sm text-muted-foreground">
+                      {new Date(withdrawal.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  {/* Action Buttons */}
                   {withdrawal.status === "pending" && (
-                    <div className="flex justify-end gap-2">
+                    <div className="flex gap-2 pt-2">
                       <Button
                         size="sm"
                         variant="outline"
-                        className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
+                        className="flex-1 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
                         onClick={() =>
                           handleStatusUpdate(
                             withdrawal.id,
@@ -268,13 +425,13 @@ const AdminWithdrawalsPanel = () => {
                             withdrawal.network
                           )
                         }
-                        title="Reject"
                       >
-                        <XCircle className="w-4 h-4" />
+                        <XCircle className="w-4 h-4 mr-2" />
+                        Reject
                       </Button>
                       <Button
                         size="sm"
-                        className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white"
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                         onClick={() =>
                           handleStatusUpdate(
                             withdrawal.id,
@@ -284,27 +441,17 @@ const AdminWithdrawalsPanel = () => {
                             withdrawal.network
                           )
                         }
-                        title="Approve"
                       >
-                        <CheckCircle className="w-4 h-4" />
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Approve
                       </Button>
                     </div>
                   )}
-                </TableCell>
-              </TableRow>
-            ))}
-            {withdrawals.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="text-center py-8 text-muted-foreground"
-                >
-                  No withdrawal requests found
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
       </CardContent>
     </Card>
   );

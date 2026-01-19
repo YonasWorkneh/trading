@@ -129,6 +129,8 @@ const Auth = () => {
           title: "Verification Email Sent",
           description: "Please check your email and click the verification link. You'll be redirected to login once verified.",
         });
+        // Redirect to login page with email pre-filled
+        navigate(`/auth?email=${encodeURIComponent(email)}`);
       } else {
         toast({
           title: "Error",
