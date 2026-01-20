@@ -224,7 +224,7 @@ const Index = () => {
                               }`}
                             >
                               {isPositive ? "+" : ""}
-                              {nft.price_change_percentage_24h.toFixed(2)}%
+                              {nft.price_change_percentage_24h?.toFixed(2) || "0.00"}%
                             </div>
                           </div>
                         </Link>
@@ -274,7 +274,7 @@ const Index = () => {
                               }`}
                             >
                               {isPositive ? "+" : ""}
-                              {market.price_change_percentage_24h.toFixed(2)}%
+                              {market.price_change_percentage_24h?.toFixed(2) || "0.00"}%
                             </div>
                           </div>
                         </Link>
@@ -324,7 +324,7 @@ const Index = () => {
                               </div>
                             </div>
                             <div className="text-sm font-semibold text-[#2463eb]">
-                              +{nft.price_change_percentage_24h.toFixed(2)}%
+                              +{nft.price_change_percentage_24h?.toFixed(2) || "0.00"}%
                             </div>
                           </div>
                         </Link>
@@ -365,7 +365,7 @@ const Index = () => {
                               </div>
                             </div>
                             <div className="text-sm font-semibold text-[#2463eb]">
-                              +{market.price_change_percentage_24h.toFixed(2)}%
+                              +{market.price_change_percentage_24h?.toFixed(2) || "0.00"}%
                             </div>
                           </div>
                         </Link>
@@ -414,7 +414,7 @@ const Index = () => {
                               </div>
                             </div>
                             <div className="text-sm font-semibold text-red-500">
-                              {nft.price_change_percentage_24h.toFixed(2)}%
+                              {nft.price_change_percentage_24h?.toFixed(2) || "0.00"}%
                             </div>
                           </div>
                         </Link>
@@ -455,7 +455,7 @@ const Index = () => {
                               </div>
                             </div>
                             <div className="text-sm font-semibold text-red-500">
-                              {market.price_change_percentage_24h.toFixed(2)}%
+                              {market.price_change_percentage_24h?.toFixed(2) || "0.00"}%
                             </div>
                           </div>
                         </Link>
