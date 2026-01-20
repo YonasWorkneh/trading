@@ -89,7 +89,7 @@ const AssetDetail = () => {
               }`}
           >
             {isPositive ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
-            {Math.abs(asset.price_change_percentage_24h).toFixed(2)}%
+            {Math.abs(asset.price_change_percentage_24h || 0).toFixed(2)}%
           </div>
         </div>
       </div>
