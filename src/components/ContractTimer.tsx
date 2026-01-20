@@ -134,7 +134,7 @@ const ContractTimer = () => {
                         className={`flex items-center gap-1 text-sm font-mono font-medium ${statusColor}`}
                       >
                         <Clock className="w-3 h-3" />
-                        {timeLeft.toFixed(1)}s
+                        {timeLeft?.toFixed(1)}s
                       </div>
                     </div>
 
@@ -212,7 +212,7 @@ const ContractTimer = () => {
                         : "text-foreground"
                     }`}
                   >
-                    {timeLeft.toFixed(1)}s
+                    {timeLeft?.toFixed(1)}s
                   </div>
                   <div className={`text-lg font-medium ${statusColor}`}>
                     {isWinning ? "Winning" : "Losing"} ($

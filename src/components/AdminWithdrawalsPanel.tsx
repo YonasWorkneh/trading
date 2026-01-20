@@ -356,11 +356,11 @@ const AdminWithdrawalsPanel = () => {
                       <span className="text-xs text-muted-foreground">Amount</span>
                       <div className="text-right">
                         <div className="font-mono font-bold text-foreground">
-                          ${withdrawal.amount.toFixed(2)}
+                          ${withdrawal.amount?.toFixed(2)}
                         </div>
                         {withdrawal.fee > 0 && (
                           <div className="text-xs text-muted-foreground">
-                            Fee: ${withdrawal.fee.toFixed(2)}
+                            Fee: ${withdrawal.fee?.toFixed(2)}
                           </div>
                         )}
                         <Badge

@@ -257,11 +257,11 @@ const AdminSendsPanel = () => {
                                             <span className="text-xs text-muted-foreground">Amount</span>
                                             <div className="text-right">
                                                 <div className="font-mono font-bold text-foreground">
-                                                    ${send.amount.toFixed(2)}
+                                                    ${send.amount?.toFixed(2)}
                                                 </div>
                                                 {send.fee > 0 && (
                                                     <div className="text-xs text-muted-foreground">
-                                                        Fee: ${send.fee.toFixed(2)}
+                                                        Fee: ${send.fee?.toFixed(2)}
                                                     </div>
                                                 )}
                                             </div>
