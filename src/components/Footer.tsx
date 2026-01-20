@@ -1,4 +1,4 @@
-import { Github, Twitter } from "lucide-react";
+import { Github, Instagram, Twitter } from "lucide-react";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 
@@ -18,7 +18,7 @@ const Footer = () => {
                   <Twitter className="w-4 h-4" />
                 </Button>
                 <Button variant="ghost" size="icon">
-                  <Github className="w-4 h-4" />
+                  <Instagram className="w-4 h-4" />
                 </Button>
               </div>
             </div>
