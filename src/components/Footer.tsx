@@ -14,12 +14,16 @@ const Footer = () => {
                 Trade with confidence.
               </p>
               <div className="flex space-x-4">
-                <Button variant="ghost" size="icon">
-                  <Twitter className="w-4 h-4" />
-                </Button>
-                <Button variant="ghost" size="icon">
-                  <Instagram className="w-4 h-4" />
-                </Button>
+                <a href="https://x.com/TradePremium" target="_blank" rel="noopener noreferrer"> 
+                  <Button variant="ghost" size="icon">
+                    <Twitter className="w-4 h-4" />
+                  </Button>
+                </a>
+                <a href="https://www.instagram.com/tradepremium/" target="_blank" rel="noopener noreferrer">
+                  <Button variant="ghost" size="icon">
+                    <Instagram className="w-4 h-4" />
+                  </Button>
+                </a>
               </div>
             </div>
 
